@@ -1,0 +1,223 @@
+\section{Overview}
+
+\subsection{Errors in Classical Machine Learning}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=15cm]{error.pdf}
+    \caption{Approximation error, Estimation error, Optimization error.}
+    \label{fig:error}
+\end{figure}
+
+\begin{itemize}
+    \item $R(f) := \underset{(x, y) \sim \calD}{\bbE} \calL(y, f_{\bth}(x))$: Expected risk of a model $f$.
+    \item $\hat{R}_N(f) := \frac1N \sum_{i=1}^{N} \calL(y_i, f_{\bth}(x_i))$: Empirical risk of a model $f$.
+    \item $\calF \subset \calY^\calX$: A hypothesis class, or a set of functions that a machine learning model can take.
+    \item $\tilde{f}_N$: Model that we get after training on $N$ samples using a learning algorithm.
+    \item $\hat{f}_N \defeq \argmin\limits_{f \in \mathcal{F}} \hat{R}_N(f)$: Model that minimizes the empirical risk over the hypothesis class $\calF$.
+    \item $f_\calF \defeq \argmin\limits_{f \in \calF} R(f)$: Model that minimizes the expected risk over the hypothesis class $\calF$.
+    \item $f^* \defeq \argmin\limits_{f \in \calY^\calX} R(f)$: Model that minimizes the expected risk over all measurable functions.
+\end{itemize}
+
+\begin{align}
+    \underbrace{
+        R(\tilde{f}_N) - R(f^*)
+    }_{\text{Exess risk}}
+    \;\;=\;\;
+    \underbrace{
+        R(\tilde{f}_N) - R(\hat{f}_N)
+    }_{\text{Optimization error}}
+    \;\;+\;\;
+    \underbrace{
+        R(\hat{f}_N) - R(f_\calF)
+    }_{\text{Estimation error}}
+    \;\;+\;\;
+    \underbrace{
+        R(f_\calF) - R(f^*)
+    }_{\text{Approximation error}}
+\end{align}
+
+\begin{remark}\quad\par
+\begin{itemize}
+    \item While Approximation and Optimization errors are important, they are relatively better managed through advances in model architecture, size, and training techniques in modern classical machine learning. Estimation error remains a significant challenge due to the inherent limitations of available training data.
+    \item The relationship between the Approximation error and the Estimation error is similar to the Bias-Variance trade-off in conventional statistical learning theory. (Not exactly the same. Refer to Fig.2 in Ref.~\cite{brown2024bias})
+\end{itemize}
+\end{remark}
+
+
+
+\begin{lemma}[Estimation error and Generalization error]
+    \begin{align}
+        \underbrace{R(\hat{f}_N) - R(f_\calF)}_{\text{Estimation error}}
+        \leq 2\,\underset{f\in \calF}{\sup}|\underbrace{R(f) - \hat{R}_N(f)}_{\text{Generalization error}}|
+    \end{align}
+\end{lemma}
+
+
+\begin{proof}
+    \begin{align}
+        \underbrace{R(\hat{f}_N) - R(f_\calF)}_{\text{Estimation error}}
+        &= R(\hat{f}_N)  - \hat{R}_N(\hat{f}_N) + \overset{\leq\,0}{\underline{\hat{R}_N(\hat{f}_N) - \hat{R}_N(f_\calF)}} + \hat{R}_N(f_\calF) - R(f_\calF)\\
+        &\leq R(\hat{f}_N)  - \hat{R}_N(\hat{f}_N) + \hat{R}_N(f_\calF) - R(f_\calF)\\
+        &\leq 2\,\underset{f\in \calF}{\sup}|\underbrace{R(f) - \hat{R}_N(f)}_{\text{Generalization error}}|%\\[1em]
+        % \implies
+        % \bbE_\calS[\underbrace{R(\hat{f}_N) - R(f_\calF)}_{\text{Estimation error}}]
+        % &\leq \bbE_\calS[\underbrace{R(\hat{f}_N) - \hat{R}_N(\hat{f}_N)}_{\text{Generalization error}}]
+        % + \underset{=\,0}{\underline{\bbE_\calS[\hat{R}_N(f_\calF) - R(f_\calF)]}}\\
+        % &= \bbE_\calS[R(\hat{f}_N) - \hat{R}_N(\hat{f}_N)]\\
+        % &\leq \bbE_\calS[\underset{f\in \calF}{\sup}\{R(f) - \hat{R}_N(f)\}]\\
+        % &\leq 2\bbE_\calS[\mathfrak{R}(\calG\bullet\calS)]\\
+        % &\leq 2\mathfrak{R}(\calG\bullet\calS) + 2C\sqrt{\frac{\ln(2/\delta)}{2N}}
+    \end{align}
+\end{proof}
+
+
+\subsection{Errors in Quantum Machine Learning}
+In quantum machine learning, we have another source of error: "measurement error".
+Let $\tilde{f}_{N,M}$ be the hypothesis that we get after training on $N$ samples with $M$ measurements and define 
+\begin{align}
+    \hat{f}_{N,M} \defeq \argmin\limits_{f \in \mathcal{F}} \hat{R}_{N,M}(f)
+\end{align}
+, where $\hat{R}_{N,M}(f)$ is the empirical risk of $f$ estimated from $M$ measurements for each training example out of $N$ samples.
+Then, the total error in quantum machine learning is given by
+% \begin{align}
+%     R(\tilde{f}_{N,M}) - R(h^*)
+%     &=
+%     \underbrace{
+%         R(\tilde{f}_{N,M}) - R(\tilde{f}_N)
+%     }_{\text{Statistical error}}
+%     +
+%     \underbrace{
+%         R(\tilde{f}_N) - R(\hat{f}_N)
+%     }_{\text{Optimization error}}
+%     +
+%     \underbrace{
+%         R(\hat{f}_N) - R(f_\calF)
+%     }_{\text{Estimation error}}
+%     +
+%     \underbrace{
+%         R(f_\calF) - R(f^*)
+%     }_{\text{Approximation error}}
+% \end{align}
+
+
+
+\begin{align}
+    R(\tilde{f}_{N,M}) - R(h^*)
+    &=
+    \underbrace{
+        R(\tilde{f}_{N,M}) - R(\hat{f}_{N,M})
+    }_{\text{Optimization error}}
+    +
+    % \underbrace{
+    %     R(\hat{f}_{N,M}) - R(\hat{f}_N)
+    % }_{\text{Measurement error}}
+    % +
+    \underbrace{
+        R(\hat{f}_{N,M}) - R(f_\calF)
+    }_{\text{Estimation error}}
+    +
+    \underbrace{
+        R(f_\calF) - R(f^*)
+    }_{\text{Approximation error}}
+\end{align}
+
+
+
+\begin{lemma}[Estimation error and Generalization error in quantum machine learning]
+    \quad\par
+    Estimation error in quantum machine learning can be bounded by the Generalization error and the Measurement error as follows:
+    \begin{align}
+        \underbrace{R(\hat{f}_{N,M}) - R(f_\calF)}_{\text{Estimation error}}
+        \leq 2\,\underset{f\in \calF}{\sup}|\underbrace{R(f) - \hat{R}_N(f)}_{\text{Generalization error}}|
+        +    2\,\underset{f\in \calF}{\sup}|\underbrace{\hat{R}_N(f) - \hat{R}_{N,M}(f)}_{\text{Measurement error}}|
+    \end{align}
+\end{lemma}
+
+
+\begin{proof}
+    \begin{align}
+        \underbrace{R(\hat{f}_{N,M}) - R(f_\calF)}_{\text{Estimation error}}
+        &= R(\hat{f}_{N,M})  - \hat{R}_{N,M}(\hat{f}_{N,M}) + \overset{\leq\,0}{\underline{\hat{R}_{N,M}(\hat{f}_{N,M}) - \hat{R}_{N,M}(f_\calF)}} + \hat{R}_{N,M}(f_\calF) - R(f_\calF)\\
+        &\leq R(\hat{f}_{N,M})  - \hat{R}_{N,M}(\hat{f}_{N,M}) + \hat{R}_{N,M}(f_\calF) - R(f_\calF)\\
+        &\leq 2\,\underset{f\in \calF}{\sup}|R(f) - \hat{R}_{N,M}(f)|\\
+        &\leq 2\,\underset{f\in \calF}{\sup}|\underbrace{R(f) - \hat{R}_N(f)}_{\text{Generalization error}}|
+        +     2\,\underset{f\in \calF}{\sup}|\underbrace{\hat{R}_N(f) - \hat{R}_{N,M}(f)}_{\text{Measurement error}}|%\\[1em]
+        % \implies
+        % \bbE_{\calS,\calM}[R(\hat{f}_{N,M})  - \hat{R}_{N,M}(f_\calF)]
+        % &\leq \bbE_{\calS,\calM}[R(\hat{f}_{N,M})  - \hat{R}_{N,M}(\hat{f}_{N,M})]
+        % + \underset{=\,0}{\underline{\bbE_{\calS,\calM}[\hat{R}_{N,M}(f_\calF) - R(f_\calF)]}}\\
+        % &= \bbE_{\calS,\calM}[R(\hat{f}_{N,M})  - \hat{R}_{N,M}(\hat{f}_{N,M})]\\
+        % &=
+        % \bbE_{\calS,\calM}[
+        %     R(\hat{f}_{N,M})  - \hat{R}_N(\hat{f}_{N,M})
+        % ]
+        % + \bbE_{\calS,\calM}[
+        %     \hat{R}_N(\hat{f}_{N,M})  - \hat{R}_{N,M}(\hat{f}_{N,M})
+        % ]\\
+        % &\leq \bbE_{\calS,\calM}[
+        %     \underset{f\in \calF}{\sup}\{R(f)  - \hat{R}_N(f)\}
+        % ]
+        % + \bbE_{\calS,\calM}[
+        %     \underset{f\in \calF}{\sup}\{\hat{R}_N(f)  - \hat{R}_{N,M}(f)\}
+        % ]\\
+        % &= \bbE_{\calS}[
+        %     \underbrace{\underset{f\in \calF}{\sup}\{R(f)  - \hat{R}_N(f)\}
+        %     }_{\text{Generalization error}}]
+        % + \bbE_{\calS,\calM}[
+        %     \underbrace{\underset{f\in \calF}{\sup}\{\hat{R}_N(f)  - \hat{R}_{N,M}(f)\}
+        % }_{\text{Measurement error}}]
+    \end{align}
+\end{proof}
+
+\begin{remark}
+    If we measure the output of the quantum model $M$ times for each training example, then the Measurement error is $LC\sqrt{\frac{2\log(2/\delta)}{NM}}$ as shown in "6. Extension to unbiased estimates of measurement statistics" in Ref.~\cite{caro2022generalization}. Since the Generalization error bound is $\order{\sqrt{\frac{T}{N}}}$, the generalization error is still the dominant source of error in quantum machine learning.
+    \begin{align}
+        R(f_{\bth}) - \hat{R}_N(f_{\bth})
+        &\leq 2L\,\frakR(\calF\bullet\calS) + LC\sqrt{\frac{2\log(2/\delta)}{NM}} + 3LC\sqrt{\frac{2\log(2/\delta)}{N}}
+    \end{align}
+\end{remark}
+
+
+\begin{comment}
+In practice, we cannot obtain the exact value of $\Tr[O \calE_{\bth}(\rho(x_i))]$ for a training example $(x_i,y_i)$ if we only perform finitely many measurements. Instead, as a proxy for the training error, we consider an unbiased estimator: For $1\leq m\leq M$, with $M\in\bbN$ fixed, we independently pick $i_m$ uniformly at random from $\{1,\ldots,N\}$ and measure the observable $O$ on the output state $\calE_{\bth}(\rho(x_{i_m}))$ to yield a single measurement outcome $o_{\bth,m} \in [-\norm{O}, \norm{O}]$. We denote the set of all $M$ measurement outcomes by $\calM = (o_{\bth,1},\ldots,o_{\bth,M})$. Then, the mean of these $M$ measurements is an unbiased estimator of the training error, i.e.,
+\begin{equation}
+    \frac{1}{M} \sum_{m=1}^{M}  o_{\bth, m} 
+    \xrightarrow{M\rightarrow\infty} \frac{1}{N} \sum_{i=1}^N \Tr[O \calE_{\bth}(\rho(x_i))].
+\end{equation}
+In this scenario, where we only obtain a noisy estimate of the training error from $M$ measurements, the prediction performance guarantee takes the following form:
+
+
+
+\begin{corollary}\label{cor:EstimatedTrainingError}
+Let $\calE_{\bth}(\cdot)$ be a quantum machine learning model with a fixed architecture consisting of $T$ parameterized 2-qubit CPTP maps. Let $P$ be a probability distribution over input-output pairs.
+Suppose that, given training data $\calS=\{(x_i,y_i)\}_{i=1}^N$ of size $N$, we perform $M\in\bbN$ measurements to estimate the training error, and $\bth^\ast = \argmin_{\bth} \frac1M \sum_{m=1}^M \Tr[O \calE_{\bth}(\rho(x_{i_m}))]$, where $i_1,\ldots,i_M$ are i.i.d.~samples from $\{1,\ldots,N\}$.
+Then, with probability at least $1-\delta$ over the choice of i.i.d.~training data $S$ of size $N$ according to $P$, over the sampling of $i_1,\ldots,i_{M}$, and over the $M$ obtained measurement outcomes, 
+\begin{equation}
+     \E_{x, y} \ell (\bth^*; x, y) - \frac{1}{M} \sum_{m=1}^{M}  o_{\bth^\ast, m} 
+     \in \calO\left(C_\mathrm{loss}\left( \sqrt{\frac{T\log(T)}{N}}+ \sqrt{\frac{\log(\nicefrac{1}{\delta})}{N}} + \sqrt{\frac{\log(\nicefrac{1}{\delta})}{M}} \right)\right).
+\end{equation}
+\end{corollary}
+
+
+
+\begin{proof}
+We first insert a zero in terms of the empirical risk as follows:
+\begin{equation}
+    \E_{x, y} \ell (\bth^*; x, y) - \frac{1}{M} \sum_{m=1}^{M}  o_{\bth^\ast, m}
+    = \left(\E_{x, y} \ell (\bth^*; x, y) - \frac{1}{N} \sum_{i=1}^{N} \ell (\bth^\ast; x_i, y_i) \right) + \left( \frac{1}{N} \sum_{i=1}^{N} \ell (\bth^\ast; x_i, y_i)- \frac{1}{M} \sum_{m=1}^{M}  o_{\bth^\ast, m} \right).
+\end{equation}
+By Theorem \ref{thm:prediction-error-bound-qnn}, with probability at least $1-\frac{\delta}{2}$ over the choice of the training data, the first term on the right-hand side (which is independent of the subsampling and of the obtained measurement outcomes) is bounded as $\in \calO\left(C_\mathrm{loss}\left( \sqrt{\frac{T\log(T)}{N}} + \sqrt{\frac{\log(\nicefrac{1}{\delta})}{N}} \right)\right)$. By Hoeffding's inequality, for any fixed $S$ and $\bth^\ast$, with probability at least $1-\frac{\delta}{2}$ over the sampling of $i_1,\ldots,i_{M}$ and over the $M$ obtained measurement outcomes, the second term on the right-hand side is $\leq C_\mathrm{loss} \sqrt{\frac{2\log(\nicefrac{2}{\delta})}{M}}$. Therefore, we also have
+\begin{align}
+    &\hphantom{=}\bbP\left[\frac{1}{N} \sum_{i=1}^{N} \ell (\bth^\ast; x_i, y_i)- \frac{1}{M} \sum_{m=1}^{M}  o_{\bth^\ast, m} > C_\mathrm{loss} \sqrt{\frac{2\log(\nicefrac{2}{\delta})}{M}}\right]\\
+    &= \bbE_{S,\bth^\ast}\left[\bbP\left[\frac{1}{N} \sum_{i=1}^{N} \ell (\bth^\ast; x_i, y_i)- \frac{1}{M} \sum_{m=1}^{M}  o_{\bth^\ast, m} > C_\mathrm{loss} \sqrt{\frac{2\log(\nicefrac{2}{\delta})}{M}}~\Big\rvert~ S,\bth^\ast\right]\right]\\
+    &\leq \bbE_{S,\bth^\ast}\left[\frac{\delta}{2}\right]\\
+    &= \frac{\delta}{2}.
+\end{align}
+Now, the statement of the Corollary follows via a union bound.
+\end{proof}
+
+This shows that we do not need to perform a disproportionately large number of measurements to guarantee that the estimated training error is indeed a good proxy for the prediction error. 
+It suffices to choose $M$ to be roughly $\nicefrac{N}{T\log{T}}$, along with $N$ being sufficiently larger than $T\log{T}$, to guarantee that the prediction error will not be much higher than the approximate (observed) training error.
+
+\memo{We can also consider the case where we measure S times for each training example, \ie $M = N\cdot S$.}
+\end{comment}

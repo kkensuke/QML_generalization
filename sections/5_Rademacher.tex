@@ -1,0 +1,924 @@
+\section{Rademacher complexity}
+\subsection{Notation}
+\begin{itemize}
+    \item $\calX, \calY$: input and output spaces
+    \item $\calZ \defeq \calX \times \calY$
+    \item $\calS \defeq \{(\bs{x}_1, y_1), (\bs{x}_2, y_2), \ldots, (\bs{x}_N, y_N)\} \subset \calZ$: : a set of $N$ training samples
+    \item $\calF = \set{f: \calX \to [0, C]} \subset \calY^{\calX}$: hypotheses class. $\calY^{\calX}$ denotes the set of all functions from $\calX$ to $\calY$
+    \item $\calL(y, f(\bs{x})): \calY \times \calY \to [0, LC]$: loss function. $L$ is the Lipschitz constant of the loss function
+    \item $\hat{R}_N(f) \defeq \frac1N \sum_{i=1}^{N} \calL(y_i, f(\bs{x}_i))$: empirical risk of a hypothesis $f\in\calF$ over a sample $\calS$
+    \item $R(f) \defeq \bbE_{(\bs{x}, y) \sim P} [\calL(y, f(\bs{x}))]$: expected risk of a hypothesis $f\in\calF$
+    \item $\calG \defeq \{(\bs{x}, y) \mapsto \calL(y, f(\bs{x})) \mid f \in \calF\} \subseteq [0, LC]^{\calZ}$: loss function class
+    \item $\calF\bullet\calS \defeq \set{(f(\bs{x}_1),\ldots,f(\bs{x}_N))}[f \in \calF, (\bs{x}_i,y_i)\in\calS] \subset [0, C]^N$: prediction evaluated on a sample $\calS$
+    \item $\calG\bullet\calS \defeq \set{(\calL(y_1,f(\bs{x}_1)), \ldots, \calL(y_N,f(\bs{x}_N)))}[f \in \calF, (\bs{x}_i,y_i)\in\calS] \subset [0, LC]^N$: loss function evaluated on a sample $\calS$
+\end{itemize}
+
+
+\subsection{Definition of Rademacher complexity}
+
+\begin{definition}[Rademacher complexity of a class of functions]
+    Given a set $\calS = \{z_1, z_2, \ldots, z_N\} \subset \calZ^N$, the empirical Rademacher complexity of $\calG$ \wrt $\calS$ is defined as
+    \begin{align}
+        \frakR(\calG\bullet\calS) \defeq \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \left[\sup_{g \in \calG} \frac1N \sum_{i=1}^{N} \sigma_{i} g(z_i)\right]
+    \end{align}
+    , where $\bs{\sigma}=(\sigma_{1}, \cdots, \sigma_N)$ is a vector of independent uniform random variables taking values in $\{-1,+1\}$.
+\end{definition}
+
+
+\begin{remark}
+    Rademacher complexity quantifies the capacity of the class to fit random labels. $\frakR(\calG\bullet\calS)$ is small if the class $\calG$ is simple and large if the class is complex.
+    This is exlpained as follows: to make the supremum large, the class $\calG$ should have a function $g$ that takes a large value at $z_i$ for $\sigma_i=1$ and a small value for $\sigma_i=-1$ for as many $i$ and $\bs{\sigma}$ as possible.
+    
+    If the class $\calG\,(\subset [0, b]^{\calZ})$ is complex enough, there exists a function $g$ that takes $b$ for $\sigma_i=1$ and $0$ for $\sigma_i=-1$ for all $i$ and for all $\bs{\sigma}$. In this situation, when $\bs{\sigma} = (+1, +1, \ldots, +1)$, the supremum becomes $b$, and when $\bs{\sigma} = (-1, -1, \ldots, -1)$, the supremum becomes $0$. And for any $\bs{\sigma}$, $\sup_{g \in \calG} \frac1N \sum_{i=1}^{N} \sigma_{i} g(z_i) + \sup_{g' \in \calG} \frac1N \sum_{i=1}^{N} (-\sigma_{i}) g'(z_i) = b$. Therefore, the Rademacher complexity is $b/2$ in this case.
+    
+    On the other hand, if the class $\calG$ is the simplest -- \ie $\calG$ is a singleton set --,
+    \begin{align}
+        \frakR(\calG\bullet\calS) = \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}\qty[\frac1N \sum_{i=1}^{N} \sigma_{i} g(z_i)] = \frac1N \sum_{i=1}^{N} g(z_i) \underset{\sigma_i\in\{\pm1\}}{\bbE}[\sigma_{i}] = 0.
+    \end{align}
+\end{remark}
+
+
+
+\begin{theorem}[Properties of Rademacher complexity, from Theorem 1.16 in \cite{wolf2023mathematical}]
+    Let $\calG, \calG_1, \calG_2 \subseteq [0, c]^{\calZ}$ be classes of real-valued functions on $\calZ$, and $\calS = \{z_1, z_2, \ldots, z_N\} \subset \calZ^N$.
+     Then, the Rademacher complexity of $\calG, \calG_1, \calG_2$ \wrt $\calS$ satisfies the following properties:
+    \begin{enumerate}
+        \item If $c\in\bbR$ is a constant, then $\frakR((c\,\calG) \bullet \calS) = \abs{c}\frakR(\calG\bullet\calS)$, where $c\,\calG \defeq \set{cg}[g \in \calG]$
+        \item $\frakR(\calG\bullet\calS) \leq \frakR(\calG_1 \bullet \calS)$ for any $\calG \subset \calG_1$
+        \item $\frakR((\calG_1 + \calG_2) \bullet \calS) = \frakR(\calG_1 \bullet \calS) + \frakR(\calG_2 \bullet \calS)$, where $\calG_1+\calG_2 \defeq \set{g_1(z) + g_2(z)}[g_1 \in \calG_1,\, g_2 \in \calG_2]$
+    \end{enumerate}
+\end{theorem}
+
+
+
+
+\begin{lemma}\label{lem:rademacher-complexity-bound-1}
+    Let \( \delta > 0 \) and suppose \( P \) is a probability measure on the space \( \calZ \). With probability at least \( 1 - \delta \), when drawing training data \( \calS \in \calZ^N \) from the distribution \( P^N \), the following inequality holds for any function class \( \calG \):
+    \begin{align}
+        \bbE_{\calS \sim P^N}[\frakR(\calG\bullet\calS)] \leq \frakR(\calG\bullet\calS) + LC\sqrt{\frac{\log\frac{1}{\delta}}{2N}} \label{eq:rademacher-complexity-bound-1}
+    \end{align}
+\end{lemma}
+
+
+\begin{proof}
+    Let $\phi(\calS) = \frakR(\calG\bullet\calS)$. The following inequality holds for any $\calS, \calS' \in \calZ^N$ that differ in only $j$-th element:
+    \begin{align}
+        |\phi(\calS) - \phi(\calS')|
+        &\leq
+        \abs{
+            \sup_{g \in \calG} \frac1N \sum_{i=1}^{N} \sigma_{i} g(z_i) - \sup_{g \in \calG} \frac1N \sum_{i=1}^{N} \sigma_{i} g(z_i')
+        }\\
+        &\leq
+        \abs{
+            \sup_{g \in \calG} \frac1N \sum_{i=1}^{N} \sigma_{i} \{g(z_i) - g(z_i')\}
+        }\\
+        &=
+        \abs{
+            \sup_{g \in \calG} \frac1N \sigma_{j} \{g(z_j) - g(z_j')\}
+        }\\
+        &\leq
+        \frac{LC}{N} \quad \text{(since $g \in \calG \subset [0, LC]^{\calZ}$)}
+    \end{align}
+    From this, we can apply McDiarmid's inequality \ref{lem:McDiarmid} to $\phi(\calS)$ to obtain
+    \begin{align}
+        \bbP\qty[\bbE_{\calS\sim P^N}[\phi(\calS)] - \phi(\calS) \geq \vep]
+        &\leq \exp\qty(-\frac{2N\vep^2}{L^2C^2})
+    \end{align}
+    Setting the r.h.s.\! equal to $\delta$ and solving for $\vep$ then gives that with probability at least $1-\delta$ we have
+    \begin{align}
+        \bbE_{\calS\sim P^N}[\frakR(\calG\bullet\calS)]
+        \leq \frakR(\calG\bullet\calS) + LC\sqrt{\frac{\log\frac{1}{\delta}}{2N}}
+    \end{align}
+\end{proof}
+
+The following lemma gives an important upper bound on the generalization error of a hypothesis $f$ in terms of the Rademacher complexity of $\calG\bullet\calS$.
+
+\begin{lemma}[Connection between Generalization Error and Rademacher Complexity]\label{lem:rademacher-complexity-bound-2}
+    Let \( \delta > 0 \) and suppose \( P \) is a probability measure on the space \( \calZ \). With probability at least \( 1 - \delta \), when drawing training data \( \calS \in \calZ^N \) from the distribution \( P^N \), the following inequality holds for any function \( f \in \calF \):
+    \begin{align}
+        R(f)-\hat{R}_N(f) & \leq 2 \frakR(\calG\bullet\calS) + 3LC\sqrt{\frac{\log\frac{2}{\delta}}{2N}},\\
+        R(f)-\hat{R}_N(f) & \leq 2 \bbE_{\calS \sim P^N}[\frakR(\calG\bullet\calS)] + LC\sqrt{\frac{\log\frac{1}{\delta}}{2N}}
+    \end{align}
+\end{lemma}
+
+
+\begin{proof}
+    Let $\phi(\calS) = \sup_{f \in \calF} R(f) - \hat{R}_N(f)$. The following inequality holds for any $\calS, \calS' \in \calZ^N$ that differ in only $j$-th element:
+    \begin{align}
+        |\phi(\calS) - \phi(\calS')|
+        &\leq
+        |\sup_{f \in \calF} \{R(f) - \hat{R}_N(f)\} - \sup_{f \in \calF} \{R(f) - \hat{R}_{\calS'}(f)\}|\\
+        &\overset{(a)}{\leq}
+        |\sup_{f \in \calF} \{R(f) - \hat{R}_N(f) - R(f) + \hat{R}_{\calS'}(f)\}|\\
+        &\leq
+        |\sup_{f \in \calF} \{\hat{R}_{\calS'}(f) - \hat{R}_N(f)\}|\\
+        &\leq
+        |\sup_{f \in \calF} \frac1N \sum_{i=1}^{N} \{\calL(y_i', f(\bs{x}_i')) - \calL(y_i, f(\bs{x}_i))\}|\\
+        &=
+        |\sup_{f \in \calF} \frac1N \{\calL(y_j', f(\bs{x}_j')) - \calL(y_j, f(\bs{x}_j))\}|\\
+        &\leq
+        \frac{LC}{N}
+    \end{align}
+    , where we used the fact that $\sup_{x}\{f(x)\} - \sup_{x}\{g(x)\} \leq \sup_{x}\{f(x) - g(x)\}$ in $(a)$. From this, we can apply McDiarmid's inequality \ref{lem:McDiarmid} to $\phi(\calS)$ to obtain
+    \begin{align}
+        \bbP\qty[\phi(\calS) - \bbE_{\calS\sim P^N}[\phi(\calS)] \geq \vep]
+        &\leq \exp\qty(-\frac{2N\vep^2}{L^2C^2})
+    \end{align}
+    Setting the r.h.s.\! equal to $\delta$ and solving for $\vep$ then gives that with probability at least $1-\delta$ we have
+    \begin{align}
+        \sup_{f \in \calF} R(f) - \hat{R}_N(f)
+        \leq \bbE_{\calS\sim P^N}\qty[\sup_{f \in \calF} R(f) - \hat{R}_N(f)]
+            + LC\sqrt{\frac{\log\frac{1}{\delta}}{2N}}
+    \end{align}
+    In order to bound the expectation term, we define $\calS' = \{z_1', z_2', \ldots, z_N'\} \in \calZ^N$ as a new sample drawn i.i.d. from $P^N$. Then, we have
+    \begin{align}
+        &\;\;\;\bbE_{\calS\sim P^N}\qty[\sup_{f \in \calF} \{R(f) - \hat{R}_N(f)\}]\\
+        &= \bbE_{\calS\sim P^N}\qty[\sup_{f \in \calF} \{\bbE_{\calS'\sim P^N}[\hat{R}_{\calS'}(f)] - \hat{R}_N(f)\}]\\
+        &\overset{(a)}{\leq} \bbE_{\calS,\calS'\sim P^N}[\sup_{f \in \calF} \{\hat{R}_{\calS'}(f) - \hat{R}_N(f)\}]\\
+        &= \bbE_{\calS,\calS'\sim P^N}\qty[\sup_{f \in \calF} \frac1N \sum_{i=1}^{N} \{\calL(y_i', f(\bs{x}_i')) - \calL(y_i, f(\bs{x}_i))\}]\\
+        &\overset{(b)}{=} \bbE_{\calS,\calS'\sim P^N}\underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \qty[\sup_{f \in \calF} \frac1N \sum_{i=1}^{N} \sigma_i \{\calL(y_i', f(\bs{x}_i')) - \calL(y_i, f(\bs{x}_i))\}]\\
+        &\overset{(c)}{\leq} \bbE_{\calS,\calS'\sim P^N}\underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \qty[\sup_{f \in \calF} \frac1N \sum_{i=1}^{N} \sigma_i \calL(y_i', f(\bs{x}_i')) + \sup_{f \in \calF} \frac1N \sum_{i=1}^{N} (-\sigma_i) \calL(y_i, f(\bs{x}_i))]\\
+        &= \bbE_{\calS,\calS'\sim P^N}\underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \qty[\sup_{f \in \calF} \frac1N \sum_{i=1}^{N} \sigma_i \calL(y_i', f(\bs{x}_i')) + \sup_{f \in \calF} \frac1N \sum_{i=1}^{N} \sigma_i \calL(y_i, f(\bs{x}_i))]\\
+        &= 2\bbE_{\calS\sim P^N}\underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \qty[\sup_{f \in \calF} \frac1N \sum_{i=1}^{N} \sigma_i \calL(y_i, f(\bs{x}_i))]\\
+        &= 2\bbE_{\calS\sim P^N}\underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE} \frakR(\calG\bullet\calS)
+    \end{align}
+    , where $(a)$ comes from the fact that $\sup_{x} \bbE[f(x)] \leq \bbE[\sup_{x} f(x)]$, $(b)$ comes from the fact that $\calS, \calS' \sim P^N$, $(c)$ comes from the fact that $\sup_{x} \{f(x) + g(x)\} \leq \sup_{x} f(x) + \sup_{x} g(x)$
+    
+    Therefore, with probability at least $1-\delta$, we have
+    \begin{align}
+        R(f)-\hat{R}_N(f) & \leq 2 \bbE_{\calS \sim P^N}[\frakR(\calG\bullet\calS)] + LC\sqrt{\frac{\log\frac{1}{\delta}}{2N}} \label{eq:rademacher-complexity-bound-2}
+    \end{align}
+    
+    For the second inequality, we use the union bound \ref{lem:UnionBound} over the two events that the inequalities \eqref{eq:rademacher-complexity-bound-1} and \eqref{eq:rademacher-complexity-bound-2} hold with probability at least $1-\delta/2$ each to obtain
+    \begin{align}
+        R(f)-\hat{R}_N(f) & \leq 2 \frakR(\calG\bullet\calS) + 3LC\sqrt{\frac{\log\frac{2}{\delta}}{2N}}\label{eq:rademacher-complexity-bound-3}
+    \end{align}
+\end{proof}
+
+
+
+\begin{lemma}[Talagrand's lemma from Ref.~\cite{jo2021machine}]\label{lem:talagrand}
+    Let $\Phi_1, \ldots, \Phi_N$ be $L$-Lipschitz functions from $\bbR$ to $\bbR$ and $(\sigma_1, \ldots, \sigma_N)$ be Rademacher random variables. Then, for any hypothesis set $\calF$ of real-valued functions, the following inequality holds:
+    $$
+    \frac1N \underset{\bs{\sigma}}{\bbE}
+    \left[
+        \sup_{f\in\calF} \sum_{i=1}^N \sigma_i(\Phi_i \circ f)(\bs{x}_i)
+    \right]
+    \leq \frac{L}{m} \underset{\bs{\sigma}}{\bbE}
+    \left[
+        \sup_{f\in\calF} \sum_{i=1}^N \sigma_i f(\bs{x}_i)
+    \right]
+    = L\,\frakR(\calF\bullet\calS)
+    $$
+    % In particular, if $\Phi_i=\Phi$ for all $i \in[m]$, then the following holds:
+    % $$
+    % \frakR((\Phi \circ \calF) \bullet \calS) \leq L\,\frakR(\calF\bullet\calS)
+    % $$
+\end{lemma}
+
+
+\begin{remark}
+    Let $\Phi_i = \calL(y_i, \cdot)$ and suppose that $\calL$ is $L$-Lipschitz \wrt the second argument. Then, we have
+    \begin{align}
+        \frakR(\calG\bullet\calS) \leq L\,\frakR(\calF\bullet\calS)
+    \end{align}
+    Thus, \eqref{eq:rademacher-complexity-bound-3} can be rewritten as
+    \begin{align}
+        R(f)-\hat{R}_N(f) & \leq 2L \frakR(\calF\bullet\calS) + 3LC\sqrt{\frac{\log\frac{2}{\delta}}{2N}}
+    \end{align}
+\end{remark}
+
+
+More generally, as an analogy to the definition of the Rademacher complexity of a class of functions, we can define the Rademacher complexity of a set $\calA \subset \bbR^N$.
+
+\begin{definition}[Rademacher complexity of a set $\calA \subset \bbR^N$]
+    Given a set $\calA \subset \bbR^N$, the Rademacher complexity of $\calA$ is defined as
+    \begin{align}
+        \frakR(\calA)
+        \defeq \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \left[\sup_{\bs{a} \in \calA} \frac1N \sum_{i=1}^{N} \sigma_{i} a_{i}\right]
+        = \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE} \left[\sup_{\bs{a} \in \calA} \frac{\langle\bs{\sigma}, \bs{a}\rangle}{N}\right]
+    \end{align}
+\end{definition}
+
+
+
+The following lemma gives an important upper bound on the Rademacher complexity of a set $\calA \subset \bbR^N$ in terms of the cardinality of $\calA$.
+
+\begin{lemma}[Massart's lemma]\label{lem:massart}
+    Let $\calA$ be a finite subset of $\bbR^N$. Then, the Rademacher complexity of $\calA$ is upper bounded as
+    \begin{equation}
+        \frakR(\calA) \leq \max_{\bs{a} \in \calA} \norm{\bs{a}}_2 \frac{\sqrt{2\log{|\calA|}}}{N}
+    \end{equation}
+\end{lemma}
+
+
+\begin{comment}
+\begin{proof}
+    $\forall t \geq 0$, we have that
+    \begin{align}
+    \exp \left(t \bbE_\sigma\left[\sup_{\bs{a} \in A} \sum_{i=1}^n \sigma_i a_i\right]\right)
+    & =\exp \left(\bbE_\sigma\left[t \sup_{\bs{a} \in A} \sum_{i=1}^n \sigma_i a_i\right]\right) \\
+    & \leq \bbE_\sigma\left[\exp \left(t \sup_{\bs{a} \in A} \sum_{i=1}^n \sigma_i a_i\right)\right] \quad (\text{Jensen's inequality})\\
+    & =\bbE_\sigma\left[\sup_{\bs{a} \in A} \exp \left(t \sum_{i=1}^n \sigma_i a_i\right)\right] \quad (\text{exponential is strictly increasing})\\
+    & \leq \sum_{\bs{a} \in A} \bbE_\sigma\left[\exp \left(t \sum_{i=1}^n \sigma_i a_i\right)\right]
+    \end{align}
+
+    The summand is an MGF. Due to independence,
+    \begin{align}
+    \sum_{\bs{a} \in A} \bbE_\sigma\left[\exp \left(t \sum_{i=1}^n \sigma_i a_i\right)\right] & =\sum_{\bs{a} \in A} \prod_{i=1}^n \bbE_{\sigma_i}\left[\exp \left(t \sigma_i a_i\right)\right] \\
+    & \leq \sum_{\bs{a} \in A} \prod_{i=1}^n \exp \left(t^2\left(2 a_i\right)^2 / 8\right)
+    \end{align}
+    , where the bound comes from the following lemma:
+    
+    \begin{lemma}
+        Lemma 2. Let $V$ be a random variable on $\mathbb{R}$ with $\mathbb{E}[V]=0$ and $V \in[a, b]$ with probability one. Then for all $t>0$,
+        $$
+        \mathbb{E}\left[e^{t V}\right] \leq e^{t^2(b-a)^2 / 8}
+        $$
+    \end{lemma}
+    
+    
+    This lemma was given and proved as Lemma 1 in the notes on Hoeffding's inequality. It was used to prove Hoeffding's inequality. In our case, we used $V=\sigma_i u_i, a=-u_i$, and $b=u_i$. Continuing with the proof of Massart's lemma,
+    \begin{align}
+    \sum_{u \in A} \prod_{i=1}^n \exp \left(t^2\left(2 u_i\right)^2 / 8\right) & =\sum_{u \in A} \exp \left(\frac{t^2}{2} \sum_{i=1}^n u_i^2\right) \\
+    & =\sum_{u \in A} \exp \left(\frac{t^2\|u\|_2^2}{2}\right) \\
+    & \leq \sum_{u \in A} \exp \left(\frac{t^2 r^2}{2}\right) \\
+    & =|A| \exp \left(\frac{t^2 r^2}{2}\right)
+    \end{align}
+
+    Taking the log of both sides and dividing by $t$ gives
+    \begin{align}
+    \mathbb{E}_\sigma\left[\sup _{u \in A} \sum_{i=1}^n \sigma_i u_i\right] & \leq \frac{\ln |A|}{t}+\frac{t r^2}{2} \\
+    & =r \sqrt{2 \ln |A|}
+    \end{align}
+\end{proof}
+\end{comment}
+
+
+
+
+\begin{lemma}[Lemma 26.10 in Ref.~\cite{shalev2014understanding}]\label{lem:rademacher-complexity-bound-linear}
+    Let $\calS = (\bs{x}_1, \ldots, \bs{x}_N)$ be vectors in Hilbert space. We define $\calF\bullet\calS = \{(\langle\bs{w}, \bs{x}_1\rangle, \ldots,\langle\bs{w}, \bs{x}_N\rangle): \norm{\bs{w}}_2 \leq c \}$ for some $c>0$. Then, the Rademacher complexity of $\calF\bullet\calS$ is upper bounded as
+    \begin{align}
+        \frakR(\calF\bullet\calS) \leq \frac{c\max_i\norm{\bs{x}_i}_2}{\sqrt{N}}
+    \end{align}
+\end{lemma}
+
+
+
+\begin{proof}
+    \begin{align}
+        N \frakR(\calH_2\circ\calS)
+        &= \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \sup_{\bs{a} \in \calH_2\circ\calS} \sum_{i=1}^N \sigma_i a_i
+        ]\\
+        &= \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \sup_{\bs{w}:\norm{\bs{w}}_2 \leq c} \sum_{i=1}^N \sigma_i\ev{\bs{w}|\bs{x}_i}
+        ]\\
+        &= \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \sup_{\bs{w}:\norm{\bs{w}}_2 \leq c}
+            \ev{\bs{w} | \Sigma_{i=1}^N \sigma_i \bs{x}_i}
+        ]\\
+        &\leq \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \sup_{\bs{w}:\norm{\bs{w}}_2 \leq c}
+            \norm{\bs{w}}\norm{\sum_{i=1}^N \sigma_i \bs{x}_i}_2
+        ] \quad (\text{by Cauchy-Schwarz inequality})\\
+        &\leq c\,\underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \norm{\sum_{i=1}^N \sigma_i \bs{x}_i}_2
+        ]
+    \end{align}
+    Next, using Jensen's inequality we have that
+    \begin{align}    
+        \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \norm{\sum_{i=1}^N \sigma_i \bs{x}_i}_2
+        ]
+        =\underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \qty(
+                \norm{\sum_{i=1}^N \sigma_i \bs{x}_i}_2^2
+            )^{1/2}
+        ]
+        \leq
+        \qty(
+            \underset{\bs{\sigma}}{\bbE}
+            \qty[
+                \norm{\sum_{i=1}^N \sigma_i \bs{x}_i}_2^2
+            ]
+        )^{1 / 2}
+    \end{align}
+    And, since the variables $\sigma_1,\ldots,\sigma_m$ are independent we have
+    \begin{align}
+        \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \norm{\sum_{i=1}^N \sigma_i \bs{x}_i}_2^2
+        ]
+        &= \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \sum_{i=1}^N \sum_{j=1}^N \sigma_i \sigma_j \ev{\bs{x}_i|\bs{x}_j}
+        ]\\
+        &= \sum_{i=1}^N \ev{\bs{x}_i|\bs{x}_i} \underset{\bs{\sigma}}{\bbE}[\sigma_i^2]
+        + \sum_{i \neq j} \ev{\bs{x}_i|\bs{x}_j} \underset{\bs{\sigma}}{\bbE}[\sigma_i\sigma_j]\\
+        &= \sum_{i=1}^N \norm{\bs{x}_i}_2^2\\
+        &\leq N \max_i \norm{\bs{x}_i}_2^2
+    \end{align}
+    Therefore, we have
+    \begin{align}
+        N\frakR(\calF\bullet\calS) \leq c\sqrt{N\max_i\norm{\bs{x}_i}_2^2}
+        \iff
+        \frakR(\calF\bullet\calS) \leq \frac{c\max_i\norm{\bs{x}_i}_2}{\sqrt{N}}
+    \end{align}
+\end{proof}
+
+
+We can derive the upper bound of Rademacher complexity of quantum circuit learning model by using the same technique as in the proof of Lemma \ref{lem:rademacher-complexity-bound-linear}.
+
+\newcommand{\wn}{\wireoverride{n}}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \node[scale=0.9]{
+        \begin{quantikz}
+            \lstick{$\ket{0}$}     & \gate[wires=3][3cm]{{\LARGE V(\bs{x}_i)}} & \gate[wires=3][3cm]{{\LARGE U(\bs{\th})}} & \meter{}\\
+            \lstick{$\vdots\;\;$}  & \wn &\wn & \wn\rstick{$\vdots$}\\
+            \lstick{$\ket{0}$}     &     & \qw & \meter{}
+        \end{quantikz}
+        };
+    \end{tikzpicture}
+    \caption{Quantum circuit learning model}
+    \label{fig:qcl-circuit}
+\end{figure}
+
+
+\begin{theorem}\label{thm:rademacher-complexity-bound-qcl}
+    The Rademacher complexity of quantum circuit learning model is upper bounded as
+    \begin{align}
+        \frakR(\calF\bullet\calS)
+        &\leq \norm{O}_1 \sqrt{\frac{2n\log{2}}{N}}\\
+        \frakR(\calF\bullet\calS)
+        &\leq \norm{O}_2 \sqrt{\frac{1}{N}}\\
+        \frakR(\calF\bullet\calS)
+        &\leq \norm{O}_\infty \sqrt{\frac{2^n}{N}}
+    \end{align}
+\end{theorem}
+
+
+
+% \begin{comment}
+\begin{proof}
+    We consider the Rademacher complexity of Quantum circuit learning models. Let $\calF$ be a class of quantum machine learning models, and $\calS = \{\bs{x}_1, \ldots, \bs{x}_N\}$ be a set of classical data. We define $\calF\bullet\calS = \{f(\bs{x}_1), \ldots, f(\bs{x}_N): f \in \calF\}$.
+    Then, the expectation of an observable $O$ is given by
+    \begin{align}
+        f_{\bth}(\bs{x}_i)
+        &\defeq \Tr[O U(\bth)V(\bs{x}_i)\dyad{\bs{0}}V\dg(\bs{x}_i)U\dg(\bth)]\\
+        &=: \Tr[O(\bth) \rho(\bs{x}_i)]
+        % \begin{cases}
+        %     \Tr[O(\bth) \rho(\bs{x}_i)] & \text{Quantum circuit learning}\\
+        %     \Tr[O \rho(\bs{x}_i;\bth)] & \text{Data reuploading}
+        % \end{cases}
+    \end{align}
+    Firstly, we bound $\frakR(\calF\circ\calS)$ as follows:
+    \begin{align}
+        N \frakR(\calF\circ\calS)
+        &= \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \sup_{\bs{a} \in \calF\circ\calS} \sum_{i=1}^N \sigma_i a_i
+        ]\\
+        &= \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \sup_{\bth} \sum_{i=1}^N \sigma_i \Tr[O(\bth) \rho(\bs{x}_i)]
+        ]\\
+        &= \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \sup_{\bth}
+            \Tr[O(\bth) (\Sigma_{i=1}^N \sigma_i \rho(\bs{x}_i))]
+        ]\\
+        &\leq \underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \sup_{\bth}
+            \norm{O(\bth)}_p
+            \norm{\Sigma_{i=1}^N \sigma_i \rho(\bs{x}_i)}_q
+        ] \quad (\text{by Hölder's inequality})\\
+        &\leq \norm{O}_p\,\underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \norm{\Sigma_{i=1}^N \sigma_i \rho(\bs{x}_i)}_q
+        ] \quad (\because \norm{O(\bth)}_p = \norm{O}_p)
+    \end{align}
+    
+    When $p=1$ and $q=\infty$, we have
+    \begin{align}
+        N \frakR(\calF\circ\calS)
+        &\leq \norm{O}_1\,\underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \norm{\Sigma_{i=1}^N \sigma_i \rho(\bs{x}_i)}_\infty
+        ]\\
+        &\overset{(c)}{\leq} \norm{O}_1\,
+        \sqrt{\norm{\Sigma_{i=1}^N \rho^2(\bs{x}_i)}_\infty 2\log{2^n}}\\
+        &= \norm{O}_1\,
+        \sqrt{2n\log{2}\, \Sigma_{i=1}^N\norm{\rho^2(\bs{x}_i)}_\infty}\\
+        &\leq \norm{O}_1\, \sqrt{2Nn\log{2}}
+    \end{align}
+    , where $(c)$ comes from Theorem 4.6.1 in Ref.~\cite{tropp2015introduction}.
+    Therefore, we have
+    \begin{align}
+        \frakR(\calF\bullet\calS)
+        \leq \norm{O}_1 \sqrt{\frac{2n\log{2}}{N}}
+    \end{align}
+    
+    When $p=q=2$, we have
+    \begin{align}
+        N \frakR(\calF\circ\calS)
+        &\leq \norm{O}_2\,\underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \norm{\Sigma_{i=1}^N \sigma_i \rho(\bs{x}_i)}_2
+        ]\\
+        &\leq \norm{O}_2\,
+        \sqrt{
+            \underset{\bs{\sigma}}{\bbE}
+            \qty[
+                \norm{\Sigma_{i=1}^N \sigma_i \rho(\bs{x}_i)}_2^2
+            ]
+        } \quad (\text{by Jensen's inequality})\\
+        &\leq \norm{O}_2\,
+        \sqrt{N \max_i \norm{\rho(\bs{x}_i)}_2^2}
+    \end{align}
+    Since $\norm{\rho(\bs{x}_i)}_2 = \sqrt{\Tr[(\rho(\bs{x}_i))^2]} = 1$, we have
+    \begin{align}
+        \frakR(\calF\bullet\calS)
+        \leq \frac{\norm{O}_2}{\sqrt{N}}
+        = \sqrt{\frac{\Tr[O^2]}{N}}
+    \end{align}
+    
+    When $p=\infty$ and $q=1$, we have
+    \begin{align}
+        N \frakR(\calF\circ\calS)
+        &\leq \norm{O}_\infty\,\underset{\bs{\sigma}}{\bbE}
+        \qty[
+            \norm{\Sigma_{i=1}^N \sigma_i \rho(\bs{x}_i)}_1
+        ]\\
+        &\overset{(a)}{\leq} \norm{O}_\infty\,
+        \norm{\sqrt{\sum_{i=1}^N \rho^2(\bs{x}_i;\bth)}}_1\\
+        &= \norm{O}_\infty\, \Tr[\sqrt{\sum_{i=1}^N \rho^2(\bs{x}_i;\bth)}]\\
+        &\overset{(b)}{\leq} \norm{O}_\infty\,\sqrt{2^n N}
+    \end{align}
+    , where $(a)$ comes from the operator Khintchine inequality and $(b)$ comes from the fact that $(\operatorname{Tr}[\sqrt{A}])^2 \leq \dim(A) \Tr[A]$ for any operator $A$.
+    Therefore, we have
+    \begin{align}
+        \frakR(\calF\bullet\calS)
+        \leq \norm{O}_\infty \sqrt{\frac{2^n}{N}}
+    \end{align}
+    
+    % \memo{It seems weird that the bound does not depend on the number of parameters and that the more entangled the input state is, the smaller the bound becomes. As for the latter, the empirical risk might be larger when the input state is more entangled.}
+    % \memo{This result means that the entanglement or noise in the input state affects the generalization error.}
+\end{proof}
+
+\begin{remark}[Theorem \ref{thm:rademacher-complexity-bound-qcl}]
+\quad\par
+\begin{itemize}
+    \item \cite{schuld2021supervised}
+    \item This result may be the same as \cite{huang2021power}, which investigates the generalization error of quantum kernel methods. So, the generalization error of the quantum circuit learning model and the quantum kernel method may be the same.
+    \item \cite{banchi2025statistical}
+    \item This example seems inconsistent with the result of \cite{du2023problem}, in which the generalization error exhibits a U-shaped curve with respect to the number of parameters.
+\end{itemize}
+\end{remark}
+
+
+
+\begin{comment}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10cm]{tensor.pdf}
+    \caption{Tensor network transformation $\bra{\phi_k(\bs{x}_i)}U\dg(\bth)OU(\bth)\ket{\phi_k(\bs{x}_i)} = \langle\!\langle U\dg(\bth)OU(\bth)|\,(\ket{\phi_k(\bs{x}_i)}\otimes\ket{\phi_k(\bs{x}_i)})$}
+    \label{fig:}
+\end{figure}
+
+
+\newcommand{\wn}{\wireoverride{n}}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \node[scale=0.9]{
+        \begin{quantikz}
+            \lstick{$\ket{0}$}     & \gate[wires=3][3cm]{{\LARGE U(\bs{x}_i)}} & \gate[wires=3][3cm]{{\LARGE V(\bs{\th})}} & \meter{}\\
+            \lstick{$\vdots\;\;$}  & \wn &\wn & \wn\rstick{$\vdots$}\\
+            \lstick{$\ket{0}$}     &     & \qw & \meter{}
+        \end{quantikz}
+        };
+    \end{tikzpicture}
+    \caption{Quantum circuit learning}
+    \label{fig:qcl-circuit}
+\end{figure}
+
+\newcommand{\Ux}[1]{\gate[wires=3][1cm]{{\Large U_{#1}(\bs{x}_i,\bs{\th}_{#1})}}}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \node[scale=0.9]{
+        \begin{quantikz}
+            \lstick{$\ket{0}$}    &\Ux{1}&\Ux{2}&\ \ldots\    &\Ux{L}& \meter{}\\
+            \lstick{$\vdots\;\;$} &\wn   &\wn   &\wn\ \ldots\ &\wn   & \wn\rstick{$\vdots$}\\
+            \lstick{$\ket{0}$}    &\qw   &\qw   &\ \ldots\    &\qw   & \meter{}
+        \end{quantikz}
+        };
+    \end{tikzpicture}
+    \caption{Data reuploading}
+    \label{fig:data-reuploading}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \node[scale=0.9]{
+        \begin{quantikz}
+            \lstick{$\ket{0}$} & \gate[wires=3][3cm]{{\LARGE U(\bs{x}_i)}} & \gate[wires=3][3cm]{{\LARGE U\dg(\bs{x}_j)}} & \meter{}\\
+            \lstick{$\vdots\;\;$}  & \wn & \wn & \wn\rstick{$\vdots$}\\
+            \lstick{$\ket{0}$} & & \qw & \meter{}
+        \end{quantikz}
+        };
+    \end{tikzpicture}
+    \caption{Quantum kernel}
+    \label{fig:quantum-kernel}
+\end{figure}
+\end{comment}
+
+
+\begin{comment}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=16cm]{VQML-tensor.pdf}
+    \caption{Tensor network transformation of general VQML model from From \href{http://arxiv.org/abs/2307.06937}{Dequantizing quantum machine learning models using tensor networks}}
+\end{figure}
+
+
+\begin{theorem}[From \href{http://arxiv.org/abs/2307.06937}{Dequantizing quantum machine learning models using tensor networks}]
+    Any VQML model 
+    \begin{align}
+        f_Q(\bs{x}; \bth, O)
+        &= \Tr[O^{\prime}(\bth)S(\bs{x})\rho(\bth) S\dg(\bs{x})]\\
+        &= \begin{cases}
+            \braa{O^{\prime}(\bth)\odot\rho(\bth)}\ket*{S(\bs{x})\ot S\dg(\bs{x})}\!\rangle & (a)\\
+            \braa{O^{\prime}(\bth)}\ket*{S(\bs{x})\rho(\bth) S\dg(\bs{x})}\!\rangle & (b)
+        \end{cases}
+    \end{align}
+    , where $S_r(\bs{x}) = \bigotimes_{j=1}^{n} e^{-i\phi_j^{(r)}(\bs{x})\cdot Z/2}$ and $S(\bs{x}) = \bigotimes_{r=1}^R S_r(\bs{x})$ with $R$ being the number of data-encoding gates, $O^{\prime}$ and $\rho_R$ are tensors depending on the ansatz $U$ and the parameters $\bth$.
+\end{theorem}
+
+\end{comment}
+
+
+
+
+\subsection{Rademacher complexity bound: One step discretization}
+If $|\calA| = \infty$ (or $\calA$ is a finite but very large set) then the bound from Massart's lemma \ref{lem:massart} is not useful. We can overcome this problem by approximating the large set $\calA$ with a much smaller set $\calC$, which is an $\vep$-covering net of $\calA$.
+
+
+\begin{theorem}\label{thm:one-step-discretization}
+    For $\calA \subset \bbR^N$, the Rademacher complexity $\frakR(\calA)$ is upper bounded by the covering number of $\calA$ as
+    \begin{align}
+        \frakR(\calA)
+        &= \inf_{\vep > 0} \left\{
+            \vep +
+            \max_{\bs{a} \in \calA} \norm{\bs{a}}_2 \frac{\sqrt{2\textstyle{\log}N_\mathrm{in}(\calA,\vep,\norm{\cdot}_{p,N})}}{N}
+        \right\}\\
+        &= \inf_{\vep > 0} \left\{
+            \vep +
+            \max_{\bs{a} \in \calA} \norm{\bs{a}}_2 \frac{\sqrt{2\textstyle{\log}N(\calA,\vep/2,\norm{\cdot}_{p,N})}}{N}
+        \right\}
+        % &\leq \inf_{\vep > 0} \left\{
+        %     \vep +
+        %     \max_{\bs{a} \in \calA} \norm{\bs{a}}_2 \frac{\sqrt{2\textstyle{\log}N_\mathrm{in}(\calA,N^{\frac1p}\vep,\norm{\cdot}_p)}}{N}
+        % \right\}\\
+        % \text{or }\frakR(\calA)
+        % &\leq \inf_{\vep > 0} \left\{
+        %     \vep +
+        %     (\max_{\bs{a} \in \calA}\norm{\bs{a}}_2 + \vep) \frac{\sqrt{2\textstyle{\log}N(\calA,\vep,\norm{\cdot}_{p,N})}}{N}
+        % \right\}
+    \end{align}
+\end{theorem}
+
+
+
+\begin{proof}
+    Let $\calC \subset \calA$ be an internal $\vep$-covering net of $\calA$ such that $|\calC| = N_{\text{in}}(\calA, \vep, \norm{\cdot}_{p,N})$. For each $\bs{a} \in \calA$, let $\pi(\bs{a}) = \bs{c}$ for $\bs{c} \in \calC$ such that $\norm{\bs{a} - \bs{c}}_{p,N} \leq \vep$. By linearity of the inner product and H\"{o}lder's inequality \ref{lem:holder-inequality}, for any $\bs{a} \in \calA$, $\bs{\sigma} \in \{\pm1\}^N$ and $p,q \geq 1$ such that $1/p + 1/q = 1$, we have
+    \begin{align}
+        \langle \bs{\sigma}, \bs{a} \rangle
+        &= \langle \bs{\sigma}, \pi(\bs{a}) \rangle + \langle \bs{\sigma}, \bs{a} - \pi(\bs{a}) \rangle\\
+        &\leq \langle \bs{\sigma}, \pi(\bs{a}) \rangle + \norm{\bs{\sigma}}_q \norm{a - \pi(\bs{a})}_p\\
+        &= \langle \bs{\sigma}, \pi(\bs{a}) \rangle + N^{\frac1q}\cdot N^{\frac1p} \vep\\
+        &= \langle \bs{\sigma}, \pi(\bs{a}) \rangle + N\vep
+    \end{align}
+    
+    Therefore,
+    \begin{align}
+        \frakR(\calA)
+        & =\underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \left[\sup_{\bs{a} \in \calA} \frac{\langle\bs{\sigma}, \bs{a}\rangle}{N}\right] \\
+        &\leq \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \left[\sup_{\bs{a} \in \calA} \frac{\langle\bs{\sigma}, \pi(\bs{a})\rangle+N\vep}{N}\right] \\
+        &= \vep + \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \left[\sup_{\bs{a} \in \calA} \frac{\langle\bs{\sigma}, \pi(\bs{a})\rangle}{N}\right] \\
+        &= \vep + \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \left[\sup_{\bs{c} \in \calC} \frac{\langle\bs{\sigma}, \bs{c}\rangle}{N}\right] \\
+        &= \vep + \frakR(\calC) \\
+        &\leq \vep + \max_{\bs{c} \in \calC} \norm{\bs{c}}_2\frac{\sqrt{2 \log|\calC|}}{N} \\
+        &\leq \vep + \max_{\bs{a} \in \calA} \norm{\bs{a}}_2\frac{\sqrt{2 \textstyle{\log}(N_\mathrm{in}(\calA, \vep, \norm{\cdot}_{p,N}))}}{N}\\
+        % &=    \vep + \max_{\bs{a} \in \calA} \norm{\bs{a}}_2\frac{\sqrt{2 \textstyle{\log}(N_\mathrm{in}(\calA, N^{\frac1p}\vep, \norm{\cdot}_p))}}{N}
+        &\leq \vep + \max_{\bs{a} \in \calA} \norm{\bs{a}}_2\frac{\sqrt{2 \textstyle{\log}(N(\calA, \vep/2, \norm{\cdot}_{p,N}))}}{N}
+    \end{align}
+\end{proof}
+, where we used $N_\mathrm{in}(\calA, \vep, \norm{\cdot}) \leq N(\calA, \vep/2, \norm{\cdot})$ in the last inequality.
+
+\begin{comment}
+
+\begin{corollary}
+    Lemma \ref{lem:covering-number-norm-ball} and Theorem \ref{thm:one-step-discretization} enable us to derive the following generalization bound for the Rademacher complexity of a $d$-dimensional subspace $\calA = B_p(\bs{0},R)$ in $\bbR^N$:
+    \begin{align}
+        \frakR(\calA)
+        &\leq \inf_{\vep > 0} \left\{
+            \vep +
+            (\max_{\bs{a} \in \calA} \norm{\bs{a}}_2 + \vep)
+            \frac{\sqrt{2d\,\textstyle{\log}(3R/\vep N^{\frac1p})}}{N}
+        \right\}
+    \end{align}
+\end{corollary}
+
+
+
+\begin{remark}
+    When $p < 2$, $\max_{\bs{a}\in\calA} \norm{\bs{a}}_2 \leq \max_{\bs{a}\in\calA} \norm{\bs{a}}_p \leq R$.
+    By taking $\vep = 1/N$, we can bound the Rademacher complexity as
+    \begin{align}
+        \frakR(\calA) \leq \order{\frac{\sqrt{d\log{N}}}{N}}
+    \end{align}
+    When $p \geq 2$, $\max_{\bs{a}\in\calA} \norm{\bs{a}}_2 \leq \max_{\bs{a}\in\calA} N^{1/2 - 1/p}\norm{\bs{a}}_p \leq N^{1/2 - 1/p}R$.
+    By taking $\vep = 1/N^{1/2 + 1/p}$, we can bound the Rademacher complexity as
+    \begin{align}
+        \frakR(\calA) \leq \order{\frac{\sqrt{d\log{N}}}{N^{1/2 + 1/p}}}
+    \end{align}
+    % \memo{More precisely, we need to get the optimal $\vep$ by minimizing $\vep + a\sqrt{\log(b/\vep)}$}
+\end{remark}
+\end{comment}
+
+
+
+\subsection{Rademacher complexity bound: Chaining bound}
+You can get a tighter generalization bound by using the chaining method instead of the one-step discretization method.
+
+\begin{theorem}[Chaining bound]\label{thm:chaining-bound-1}
+    Let $\calA \subset \bbR^N$ be a set such that $\max_{\bs{a}\in \calA}\norm{\bs{a}}_p \leq r$. Then, the Rademacher complexity $\frakR(\calA)$ is upper bounded by the covering number of $\calA$ as
+    \begin{align}
+        \frakR(\calA) \leq
+        \inf_{\vep \in (0, \frac{r}{2}]}
+        \qty{
+            \frac{1}{N^{\frac1p}} \qty(4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac{r}{2}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_p)}})
+        }
+    \end{align}
+\end{theorem}
+
+
+
+\begin{proof}
+    For any $k \in \{0,1,2,\ldots,M\}$, let $\calC_k \subset \bbR^N$ be an $\vep_k$-covering net of $\calA$ w.r.t. $\norm{\cdot}_p$, where $\vep_k \defeq r/2^k$ and $|\calC_k| = N(\calA, \vep_k, \norm{\cdot}_p)$.
+    In particular, we can take $\calC_0 \defeq \{\bs{0}\}$,
+    because \(\norm{\bs{a} - \bs{0}}_p \leq r =: \vep_{0}\) for all \(\bs{a} \in \calA\). For any \(k\) and any \(\bs{a} \in \calA\), let \(\pi_{k}(\bs{a}) = \bs{c}\) such that \(\bs{c} \in \calC_{k}\) and \(\norm{\bs{a} - \bs{c}}_p \leq \vep_{k}\). Furthermore, we define \(\Delta_{k}(\bs{a})=\pi_{k}(\bs{a})-\pi_{k-1}(\bs{a})\). Then, for any \(\bs{a} \in \calA\), we have
+    \[
+    \bs{a}
+    = \bs{a} + \pi_{0}(\bs{a}) - \pi_{M}(\bs{a}) + \sum_{k=1}^M \Delta_{k}(\bs{a})
+    = \bs{a}  - \pi_{M}(\bs{a}) + \sum_{k=1}^M \Delta_{k}(\bs{a}).
+    \]
+
+    Hence,
+    \begin{align}
+    \frakR(\calA)
+    &\defeq \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+    \qty[
+        \sup_{\bs{a} \in \calA} \frac{\langle \bs{a}, \bs{\sigma}\rangle}{N}
+    ]\\
+    & =\underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+    \qty[
+        \sup_{\bs{a} \in \calA}
+        \qty{
+            \frac{\langle \bs{a} - \pi_{M}(\bs{a}), \bs{\sigma}\rangle}{N}
+            + \frac{\langle\textstyle{\sum}_{k=1}^M \Delta_{k}(\bs{a}), \bs{\sigma}\rangle}{N}
+        }
+    ] \\
+    & \leq
+    \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+    \qty[
+        \sup_{\bs{a} \in \calA} \frac{\langle a-\pi_{M}(\bs{a}), \bs{\sigma}\rangle}{N}
+    ]
+    + \sum_{k=1}^M \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+    \qty[
+        \sup_{\bs{a} \in \calA} \frac{\left\langle\Delta_{k}(\bs{a}), \bs{\sigma}\right\rangle}{N}
+    ] \quad \because \sup\Sigma \leq \Sigma\sup \\
+    &= \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+    \qty[
+        \sup_{\bs{a} \in \calA} \frac{\langle a-\pi_{M}(\bs{a}), \bs{\sigma}\rangle}{N}
+    ]
+    + \sum_{k=1}^M \frakR(\Delta_{k})
+    \end{align}
+    , where \(\Delta_{k} \defeq \set{\Delta_{k}(\bs{a})}[\bs{a} \in \calA]\).
+    
+    For the first term, we use H\"{o}lder's inequality \ref{lem:holder-inequality} to obtain
+    \[
+        \langle \bs{a} - \pi_{M}(\bs{a}), \bs{\sigma}\rangle \leq \norm{\bs{a} - \pi_{M}(\bs{a})}_p \norm{\bs{\sigma}}_q \leq \vep_M N^{\frac1q}.
+    \]
+    Thus, we have
+    \begin{align}
+        \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \qty[
+            \sup_{\bs{a} \in \calA} \frac{\langle \bs{a} - \pi_{M}(\bs{a}), \bs{\sigma}\rangle}{N}
+        ]
+        \leq \frac{\vep_M}{N^{\frac1p}}
+    \end{align}
+
+    For the second term, we observe that
+    \begin{align*}
+    |\Delta_{k}| & =|\{\pi_{k}(\bs{a})-\pi_{k-1}(\bs{a}): \bs{a} \in \calA\}| \\
+    &\leq |\{\pi_{k}(\bs{a}): \bs{a} \in \calA\}| \cdot|\{\pi_{k-1}(\bs{a}): \bs{a} \in \calA\}| \\
+    &= N(\calA, \vep_{k}, \norm{\cdot}_p) \cdot N(\calA, \vep_{k-1}, \norm{\cdot}_p) \\
+    &\leq N(\calA, \vep_{k}, \norm{\cdot}_p)^{2}
+    \end{align*}
+
+    and for all \(\bs{a} \in \calA\),
+    \begin{align}
+        \norm{\Delta_{k}(\bs{a})}_p \leq \norm{\pi_{k}(\bs{a}) - \bs{a}}_p +\norm{\bs{a} - \pi_{k-1}(\bs{a})}_p \leq 3\vep_{k}
+    \end{align}
+    and remember that $\norm{\bs{a}}_p \leq \norm{\bs{a}}_2 \leq N^{(1/2 - 1/p)}\norm{\bs{a}}_p$ for all $1 \leq r < p$, so we have
+    \[
+        \norm{\Delta_{k}(\bs{a})}_2 \leq N^{(1/2 - 1/p)} \cdot 3\vep_{k}
+    \]
+
+    Thus, by Massart's lemma \ref{lem:massart}, we have
+    \[
+        \frakR(\Delta_{k}) 
+        \leq \frac{N^{(1/2 - 1/p)}3\vep_{k} \sqrt{2 \log{|\Delta_{k}|}}}{N}
+        \leq \frac{3\vep_{k}}{N^{\frac1p}\sqrt{N}} \sqrt{2 \log{|\calC_k|^2}}
+        =    \frac{6\vep_{k}}{N^{\frac1p}\sqrt{N}} \sqrt{  \log{N(\calA, \vep_{k}, \norm{\cdot}_p)}}
+    \]
+
+    Therefore,
+    \begin{align}
+    \sum_{k=1}^M \frakR(\Delta_{k}) & \leq \sum_{k=1}^M \frac{6\vep_{k}}{N^{\frac1p}\sqrt{N}} \sqrt{\log{N(\calA, \vep_{k}, \norm{\cdot}_p)}}\\
+    &= \frac{6}{N^{\frac1p}\sqrt{N}} \sum_{k=1}^M \vep_{k} \sqrt{\log{N(\calA, \vep_{k}, \norm{\cdot}_p)}} \\
+    &= \frac{12}{N^{\frac1p}\sqrt{N}} \sum_{k=1}^M (\vep_{k}-\vep_{k+1}) \sqrt{\log{N(\calA, \vep_{k}, \norm{\cdot}_p)}} \\
+    &= \frac{12}{N^{\frac1p}\sqrt{N}} \sum_{k=1}^M \int_{\vep_{k+1}}^{\vep_{k}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep_{k}, \norm{\cdot}_p)}} \\
+    &\leq \frac{12}{N^{\frac1p}\sqrt{N}} \sum_{k=1}^M \int_{\vep_{k+1}}^{\vep_{k}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_p)}} \\
+    &= \frac{12}{N^{\frac1p}\sqrt{N}} \int_{\vep_{M+1}}^{\vep_1} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_p)}}
+    \end{align}
+    
+    Finally, we have
+    \begin{align}
+        \frakR(\calA)
+        &\leq \frac{1}{N^{\frac1p}} \qty(\vep_M + \frac{12}{\sqrt{N}} \int_{\vep_{M+1}}^{\frac{r}{2}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_p)}})
+    \end{align}
+    
+    For any \(\vep \in (0, r/2]\), we can find an integer \(M\) such that \(\vep \leq \vep_{M+1} \leq 2\vep\) and thus \(\vep_M \leq 4\vep\). Then, we have
+    \begin{align}
+        \frakR(\calA) 
+        &\leq \frac{1}{N^{\frac1p}} \qty(4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac{r}{2}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_p)}}),
+    \end{align}
+    and the upper bound holds for all \(\vep \in (0, r/2]\), we can take the infimum over all \(\vep > 0\) to obtain the desired result.
+\end{proof}
+
+\begin{remark}
+    Since the above inequality holds for any $\vep \in (0, r/2]$, if we take $\vep = 0$, we have $\frakR(\calA) \leq 2r/N^{\frac1p}$.
+\end{remark}
+
+
+
+
+
+
+\begin{theorem}[Chaining bound]\label{thm:chaining-bound-2}
+    Let $\calA \subset \bbR^N$ be a set such that $\max_{\bs{a} \in \calA}\norm{\bs{a}}_{p,N} \leq r$. Then, the Rademacher complexity $\frakR(\calA)$ is upper bounded by the covering number of $\calA$ as
+    \begin{align}
+        \frakR(\calA) \leq
+        \inf_{\vep \in (0, \frac{r}{2}]}
+        \qty{
+            4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac{r}{2}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_{p,N})}}
+        }
+    \end{align}
+\end{theorem}
+
+
+
+\begin{proof}
+    For any $k \in \{0,1,2,\ldots,M\}$, let $\calC_k \subset \bbR^N$ be an $\vep_k$-covering net of $\calA$ w.r.t. $\norm{\cdot}_{p,N}$, where $\vep_k \defeq r/2^k$ and $|\calC_k| = N(\calA, \vep_k, \norm{\cdot}_{p,N})$.
+    In particular, we can take $\calC_0 \defeq \{\bs{0}\}$,
+    because \(\norm{\bs{a} - \bs{0}}_{p,N} \leq r =: \vep_{0}\) for all \(\bs{a} \in \calA\). For any \(k\) and any \(\bs{a} \in \calA\), let \(\pi_{k}(\bs{a}) = \bs{c}\) such that \(\bs{c} \in \calC_{k}\) and \(\norm{\bs{a} - \bs{c}}_{p,N} \leq \vep_{k}\). Furthermore, we define \(\Delta_{k}(\bs{a})=\pi_{k}(\bs{a}) - \pi_{k-1}(\bs{a})\). Then, for any \(\bs{a} \in \calA\), we have
+    \[
+    \bs{a}
+    = \bs{a} + \pi_{0}(\bs{a}) - \pi_{M}(\bs{a}) + \sum_{k=1}^M \Delta_{k}(\bs{a})
+    = \bs{a} - \pi_{M}(\bs{a}) + \sum_{k=1}^M \Delta_{k}(\bs{a}).
+    \]
+
+    Hence,
+    \begin{align}
+    \frakR(\calA)
+    & =\underset{\sigma \in\{ \pm 1\}^{N}}{\mathbb{E}}
+    \qty[
+        \sup_{\bs{a} \in \calA} \frac{\langle \bs{a}, \bs{\sigma}\rangle}{N}
+    ]\\
+    & =\underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+    \qty[
+        \sup_{\bs{a} \in \calA}
+        \qty{
+            \frac{\langle a-\pi_{M}(\bs{a}), \bs{\sigma}\rangle}{N}
+            + \frac{\langle\textstyle{\sum}_{k=1}^M \Delta_{k}(\bs{a}), \bs{\sigma}\rangle}{N}
+        }
+    ] \\
+    & \leq
+    \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+    \qty[
+        \sup_{\bs{a} \in \calA} \frac{\langle a-\pi_{M}(\bs{a}), \bs{\sigma}\rangle}{N}
+    ]
+    + \sum_{k=1}^M \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+    \qty[
+        \sup_{\bs{a} \in \calA} \frac{\left\langle\Delta_{k}(\bs{a}), \bs{\sigma}\right\rangle}{N}
+    ] \quad \because \sup\Sigma \leq \Sigma\sup \\
+    &= \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+    \qty[
+        \sup_{\bs{a} \in \calA} \frac{\langle a-\pi_{M}(\bs{a}), \bs{\sigma}\rangle}{N}
+    ]
+    + \sum_{k=1}^M \frakR(\Delta_{k})
+    \end{align}
+    , where \(\Delta_{k}=\{\Delta_{k}(\bs{a}): \bs{a} \in \calA\}\).
+    
+    For the first term, we use H\"{o}lder's inequality \ref{lem:holder-inequality} and the fact: $\norm{\bs{a}-\pi_{M}(\bs{a})}_{p,N} \leq \vep_M \iff \norm{\bs{a}-\pi_{M}(\bs{a})}_p \leq N^{\frac1p}\vep_M$ to obtain
+    \[
+        \langle \bs{a} - \pi_{M}(\bs{a}), \bs{\sigma}\rangle \leq \norm{\bs{a}-\pi_{M}(\bs{a})}_p \norm{\bs{\sigma}}_q \leq N^{\frac1p}\vep_M \cdot N^{\frac1q} = N\,\vep_M.
+    \]
+    Thus, we have
+    \begin{align}
+        \underset{\bs{\sigma}\in\{\pm1\}^N}{\bbE}
+        \qty[
+            \sup_{\bs{a} \in \calA} \frac{\langle \bs{a} - \pi_{M}(\bs{a}), \bs{\sigma}\rangle}{N}
+        ]
+        \leq \vep_M.
+    \end{align}
+
+    For the second term, we observe that
+    \begin{align*}
+    |\Delta_{k}| & =|\{\pi_{k}(\bs{a})-\pi_{k-1}(\bs{a}): \bs{a} \in \calA\}| \\
+    &\leq |\{\pi_{k}(\bs{a}): \bs{a} \in \calA\}| \cdot|\{\pi_{k-1}(\bs{a}): \bs{a} \in \calA\}| \\
+    &= N(\calA, \vep_{k}, \norm{\cdot}_{p,N}) \cdot N(\calA, \vep_{k-1}, \norm{\cdot}_{p,N}) \\
+    &\leq N(\calA, \vep_{k}, \norm{\cdot}_{p,N})^{2}
+    \end{align*}
+
+    and for all \(\bs{a} \in \calA\),
+    \begin{align}
+        \norm{\Delta_{k}(\bs{a})}_{p,N} \leq \norm{\pi_{k}(\bs{a}) - \bs{a}}_{p,N} +\norm{\bs{a} - \pi_{k-1}(\bs{a})}_{p,N} \leq 3\vep_{k}
+        \iff \norm{\Delta_{k}(\bs{a})}_{p} \leq 3N^{\frac1p}\vep_{k}
+    \end{align}
+    and remember that $\norm{\bs{a}}_p \leq \norm{\bs{a}}_2 \leq N^{(1/2 - 1/p)}\norm{\bs{a}}_p$ for all $1 \leq r < p$, so we have
+    \[
+        \norm{\Delta_{k}(\bs{a})}_2 \leq N^{(1/2 - 1/p)} \cdot 3N^{\frac1p}\vep_{k} = 3\sqrt{N}\vep_{k}
+    \]
+
+    Thus, by Massart's lemma \ref{lem:massart}, we have
+    \[
+        \frakR(\Delta_{k}) 
+        \leq \frac{3\sqrt{N}\vep_{k} \sqrt{2 \log{|\Delta_{k}|}}}{N}
+        \leq 3\vep_{k}\sqrt{\frac{2 \log{|\calC_k|^{2}}}{N}}
+        =    6\vep_{k}\sqrt{\frac{\log{N(\calA, \vep_{k}, \norm{\cdot}_{p,N})}}{N}}
+    \]
+
+    Therefore,
+    \begin{align}
+    \sum_{k=1}^M \frakR(\Delta_{k}) & \leq \sum_{k=1}^M 6\vep_{k}\sqrt{\frac{\log{N(\calA, \vep_{k}, \norm{\cdot}_{p,N})}}{N}} \\
+    &= \frac{6}{\sqrt{N}} \sum_{k=1}^M \vep_{k} \sqrt{\log{N(\calA, \vep_{k}, \norm{\cdot}_{p,N})}} \\
+    &= \frac{12}{\sqrt{N}} \sum_{k=1}^M (\vep_{k}-\vep_{k+1}) \sqrt{\log{N(\calA, \vep_{k}, \norm{\cdot}_{p,N})}} \\
+    &= \frac{12}{\sqrt{N}} \sum_{k=1}^M \int_{\vep_{k+1}}^{\vep_{k}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep_{k}, \norm{\cdot}_{p,N})}} \\
+    &\leq \frac{12}{\sqrt{N}} \sum_{k=1}^M \int_{\vep_{k+1}}^{\vep_{k}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_{p,N})}} \\
+    &= \frac{12}{\sqrt{N}} \int_{\vep_{M+1}}^{\vep_1} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_{p,N})}}
+    \end{align}
+    
+    Finally, we have
+    \begin{align}
+        \frakR(\calA)
+        &\leq \vep_M + \frac{12}{\sqrt{N}} \int_{\vep_{M+1}}^{\frac{r}{2}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_{p,N})}}
+    \end{align}
+    
+    For any \(\vep \in (0, r/2]\), we can find an integer \(M\) such that \(\vep \leq \vep_{M+1} \leq 2\vep\) and thus \(\vep_M \leq 4\vep\). Then, we further bound $\frakR(\calA)$ as
+    \begin{align}
+        \frakR(\calA) 
+        &\leq 4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac{r}{2}} \mathrm{d}\vep' \sqrt{\log{N(\calA, \vep', \norm{\cdot}_{p,N})}},
+    \end{align}
+    and the upper bound holds for all \(\vep \in (0, r/2]\), we can take the infimum over all \(\vep > 0\) to obtain the desired result.
+\end{proof}
+
+\begin{remark}
+    Since the above inequality holds for any $\vep \in (0, r/2]$, if we take $\vep = 0$, we have $\frakR(\calA) \leq 2r$.
+\end{remark}

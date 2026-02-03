@@ -1,0 +1,415 @@
+\section{Application to QML model}
+In this section, we derive the upper bound of the generalization error depending on the parameter-initialization strategy using covering number and Rademacher complexity.
+
+\subsection{Notation}
+\begin{itemize}
+    \item $\calX, \calY$: input and output spaces
+    \item $\calZ \defeq \calX \times \calY$
+    \item $\calS \defeq \{(\bs{x}_1, y_1), (\bs{x}_2, y_2), \ldots, (\bs{x}_N, y_N)\} \subset \calZ$: : a set of $N$ training samples
+    \item $\Theta \defeq \set{(\theta_1, \theta_2,\ldots, \theta_m)}[\theta_i \in [a_i, a_i + c_i],\, a_i,c_i \in \bbR] \subset \bbR^m$: set of parameters of VQML
+    \item $\calE_{\bs{\th}}: \rho(\bs{x}) \mapsto U(\bs{\th})\rho(\bs{x})U\dg(\bs{\th})$: parameterized quantum circuit channel
+    \item $O$: observable
+    \item $\rho(\bs{x})$: quantum input state
+    \item $\calF \defeq \set{f_{\bth}: (\bs{x}_i, y_i) \mapsto \Tr[O \calE_{\bs{\th}}(\rho(\bs{x}_i))]}[\bs{\th} \in \Theta] \subset [0, C]^{\calZ}$: hypothesis class of VQML
+    \item $\calL(y_i,f_{\bth}(\bs{x}_i))$: loss function evaluated on a sample $(\bs{x}_i, y_i)$ which is $L$-Lipschitz continuous in the second argument.
+    \item $\hat{R}_N(f_{\bth}) \defeq \frac1N \sum_{i=1}^{N} \calL(y_i, f_{\bth}(\bs{x}_i))$: empirical risk of a hypothesis $f_{\bth}\in\calF$ over a sample $\calS$
+    \item $R(f_{\bth}) \defeq \bbE_{(x, y) \sim P} [\calL(y, f_{\bth}(x))]$: expected risk of a hypothesis $f_{\bth}\in\calF$
+    \item $\calG \defeq \{(x, y) \mapsto \calL(y, f_{\bth}(x)) \mid f_{\bth} \in \calF\} \subseteq [0, LC]^{\calZ}$: loss function class
+    \item $\calF\bullet\calS \defeq \set{(f_{\bth}(\bs{x}_1),\ldots,f_{\bth}(\bs{x}_N))}[f_{\bth}\in\calF, (\bs{x}_i,y_i)\in\calS] \subset [0, C]^N$: prediction evaluated on a sample $\calS$
+    \item $\calG\bullet\calS \defeq \set{(\calL(y_1,f_{\bth}(\bs{x}_1)), \ldots, \calL(y_N,f_{\bth}(\bs{x}_N)))}[f_{\bth} \in \calF, (\bs{x}_i,y_i)\in\calS] \subset [0, LC]^N$: loss function evaluated on a sample $\calS$
+\end{itemize}
+
+Remember that from Lemma \ref{lem:rademacher-complexity-bound-2} and \ref{lem:talagrand} the generalization error for any hypothesis $f_{\bth} \in \calF$ is bounded by the Rademacher complexity with probability at least $1-\delta$ as
+\begin{align}
+    R(f_{\bth}) - \hat{R}_N(f_{\bth})
+    &\leq 2\,\frakR(\calG\bullet\calS) + 3LC\sqrt{\frac{2\log(2/\delta)}{N}}\\
+    &\leq 2L\,\frakR(\calF\bullet\calS) + 3LC\sqrt{\frac{2\log(2/\delta)}{N}} \label{eq:generalization-error-bound}
+\end{align}
+
+We can apply the one step discretization theorem \ref{thm:one-step-discretization} and the chaining bound \ref{thm:chaining-bound-2} to bound the Rademacher complexity $\frakR(\calF\bullet\calS)$. Before applying these theorems, we first bound the covering number of $\calF\bullet\calS$ by the covering number of $\Theta$.
+
+
+\begin{lemma}\label{lem:covering-number-bound-params}
+    The covering number of $\calF\bullet\calS$ can be bounded by the covering number of $\Theta$ as
+    \begin{align}
+        N(\calF\bullet\calS, \vep, \norm{\cdot}_{p,N}) \leq N(\Theta, \vep/C, \norm{\cdot}_1) \label{eq:covering-number-bound-params}
+    \end{align}
+\end{lemma}
+
+
+\begin{proof}
+    First, you can derive the following inequality for any $\bs{\th}, \tilde{\bs{\th}} \in \Theta$, using the same argument as in the proof of Theorem \ref{thm:covering-number-VQML}:
+    \begin{align}
+        |f_{\bth}(\bs{x}_i) - f_{\tilde{\bth}}(\bs{x}_i)|
+        &= \abs{\Tr[O \calE_{\bs{\th}}(\rho(\bs{x}_i))] - \Tr[O \calE_{\tilde{\bs{\th}}}(\rho(\bs{x}_i))]}\\
+        &= \abs{\Tr[O (\calE_{\bs{\th}}(\rho(\bs{x}_i)) - \calE_{\tilde{\bs{\th}}}(\rho(\bs{x}_i)))]}\\
+        &\leq \Tr\abs{O (\calE_{\bs{\th}}(\rho(\bs{x}_i)) - \calE_{\tilde{\bs{\th}}}(\rho(\bs{x}_i)))}\\
+        &=: \norm{O (\calE_{\bs{\th}}(\rho(\bs{x}_i)) - \calE_{\tilde{\bs{\th}}}(\rho(\bs{x}_i)))}_1\\
+        &\leq \norm{O}_\infty \norm{\calE_{\bs{\th}}(\rho(\bs{x}_i)) - \calE_{\tilde{\bs{\th}}}(\rho(\bs{x}_i))}_1 \quad \because \text{H\"older's inequality}\\
+        &\leq \norm{O}_\infty \norm{\calE_{\bs{\th}} - \calE_{\tilde{\bs{\th}}}}_\diamond\\
+        &\leq C\,2\sum_{l=1}^{L} \sum_{m=1}^{n}\norm*{R_{l,m}(\th_{l,m})-R_{l,m}(\tilde{\th}_{l,m})}_{\infty}\\
+        &\leq C \norm*{\bs{\th} - \tilde{\bs{\th}}}_1
+    \end{align}
+
+    (Even if the classical input data and parameters are encoded alternately (data re-uploading), the above inequality holds.)
+
+    From this inequality, we have
+    \begin{equation}
+        \norm*{\bs{f}_{\bth} - \bs{f}_{\tilde{\bs{\th}}}}_{p,N}
+        = \qty(
+            \frac1N \sum_{i=1}^N \abs{\Tr[O \calE_{\bs{\th}}(\rho(\bs{x}_i))] - \Tr[O \calE_{\tilde{\bs{\th}}}(\rho(\bs{x}_i))]}^p
+        )^{\frac1p}
+        \leq \qty(
+            \frac1N \sum_{i=1}^N C^p \norm*{\bs{\th} - \tilde{\bs{\th}}}_1^p
+        )^{\frac1p}
+        \leq C \norm*{\bs{\th} - \tilde{\bs{\th}}}_1
+    \end{equation}
+    , where $\bs{f}_{\bth} = (f_{\bth}(\bs{x}_1), \ldots, f_{\bth}(\bs{x}_N)) \in \calF\bullet\calS$.
+
+
+    Thus, from Lemma \ref{lem:2-covering-number}, we have
+    \begin{align}
+        N(\calF\bullet\calS, \vep, \norm{\cdot}_{p,N}) \leq N(\Theta, \vep/C, \norm{\cdot}_1)
+    \end{align}
+\end{proof}
+
+\begin{example}
+    If $\Theta = B_1(\bs{\theta}_0, \gamma)$, then from Lemma \ref{lem:covering-number-norm-ball}, $N(\Theta, \vep, \norm{\cdot}_1) \leq (1 + 2\gamma/\vep)^m \leq (3\gamma/\vep)^m$, so we have
+    \begin{align}
+        N(\Theta, \vep/C, \norm{\cdot}_1) \leq \qty(\frac{3\gamma C}{\vep})^m. \label{eq:covering-number-norm-ball-1}
+    \end{align}
+    % \memo{This case corresponds to kernel methods?}
+\end{example}
+
+\begin{example}
+    If $\Theta = \set{(\theta_1, \theta_2,\ldots, \theta_m)}[\theta_i \in [a_i, a_i+c_i],\, a_i,c_i \in \bbR] \subset \bbR^m$, then
+    \begin{align}
+        N(\Theta, \vep/C, \norm{\cdot}_1)
+        &\leq N(\Theta, \vep/C m, \norm{\cdot}_\infty)\\
+        &= \prod_{i=1}^{T} \left\lceil\frac{C m c_i}{\vep}\right\rceil\\
+        &\leq \prod_{i=1}^{T} \left(1 + \frac{C m c_i}{\vep}\right) && \quad (\because \lceil x \rceil \leq x+1)\\
+        &\leq \prod_{i=1}^{T} \left(\frac{1 + C m c_i}{\vep}\right) && \quad (\because 1 \leq 1/\vep)\label{eq:covering-number-norm-ball-infty}
+    \end{align}
+
+\end{example}
+
+% \memo{It seems that it is better to use the set of trigonometric functions as $\calG$ to precisely bound the covering number.}
+
+
+
+\subsection{One step discretization}
+We can bound $\Tr[O\,\calE_{\bs{\th}}(\rho(\bs{x}_i))]$ as
+\begin{align}
+    \Tr[O\,\calE_{\bs{\th}}(\rho(\bs{x}_i))]
+    \leq \Tr|O\,\calE_{\bs{\th}}(\rho(\bs{x}_i))|
+    =    \norm{O\,\calE_{\bs{\th}}(\rho(\bs{x}_i))}_1
+    \leq \norm{O}_\infty \norm{\calE_{\bs{\th}}(\rho(\bs{x}_i))}_1
+    = C \cdot 1
+\end{align}
+, where we used H\"older's inequality \ref{lem:holder-inequality} in the second inequality and the fact that the diamond norm of a quantum channel is $1$ in the last equality.
+
+So, we have
+\begin{align}
+    \underset{\bs{f}_{\bth} \in \calF\bullet\calS}{\max}\norm{\bs{f}_{\bth}}_2
+    \leq \qty(\sum_{i=1}^N \Tr[O\,\calE_{\bs{\th}}(\rho(\bs{x}_i))]^2)^{\frac12}
+    \leq \qty(\sum_{i=1}^N C^2)^{\frac12}
+    = N^\frac12 C
+\end{align}
+and we can apply Theorem \ref{thm:one-step-discretization} to obtain
+\begin{align}
+    \frakR(\calF\bullet\calS) 
+    \leq \inf_{\vep > 0} \left\{
+        \vep +
+        C \sqrt{\frac{2\textstyle{\log}N(\calF\bullet\calS,\vep/2,\norm{\cdot}_{p,N})}{N}}
+    \right\}.
+\end{align}
+
+Using the covering number bound in Eq. \ref{eq:covering-number-bound-params}, we have
+\begin{align}
+    \frakR(\calF\bullet\calS)
+    &\leq \inf_{\vep > 0} \left\{
+        \vep +
+        C \sqrt{\frac{2\textstyle{\log}N(\Theta,\vep/2C,\norm{\cdot}_1)}{N}}
+    \right\} \quad \because \text{Eq.\eqref{eq:covering-number-bound-params}}\\
+    &= \inf_{\vep > 0} C\left\{
+        \vep +
+        \sqrt{\frac{2\textstyle{\log}N(\Theta,\vep/2,\norm{\cdot}_1)}{N}}
+    \right\} \quad \because \vep \to C\vep
+\end{align}
+
+
+If $\Theta = B_1(\bs{\theta}_0, \gamma)$, then from Eq.\eqref{eq:covering-number-norm-ball-1} we have
+\begin{align}
+    \frakR(\calF\bullet\calS) 
+    &\leq C\left\{
+        \vep +
+        \sqrt{\frac{2m\log(6\gamma C/\vep)}{N}}
+    \right\}\\
+    &\leq C\left\{
+        \frac1N +
+        \sqrt{\frac{2m\log(6\gamma NC)}{N}}
+    \right\} \quad (\because \text{choose } \vep = 1/N)
+\end{align}
+
+
+If $\Theta = \set{(\theta_1, \theta_2,\ldots, \theta_m)}[\theta_i \in [a_i, a_i+c_i],\, a_i,c_i \in \bbR] \subset \bbR^m$, then from Eq.\eqref{eq:covering-number-norm-ball-infty} we have
+\begin{align}
+    \frakR(\calF\bullet\calS)
+    &\leq \inf_{\vep > 0} C\left\{
+        \vep +
+        \sqrt{\frac{2\sum_{i=1}^{T}\log(1 + \frac{2C m c_i}{\vep})}{N}}
+    \right\}\\
+    &\leq C\left\{
+        \frac1N +
+        \sqrt{\frac{2\sum_{i=1}^{T}\log(1 + 2NC m c_i)}{N}}
+    \right\} \quad (\because \text{choose } \vep = 1/N)
+\end{align}
+In one step discretization, the dependence on the number of data points $N$ is $O(\sqrt{\log{N}/N})$. This can be improved to $O(\sqrt{1/N})$ by chaining the covering numbers.
+
+Finally, we get the generalization error bound by substituting the upper bound of Rademacher complexity into Eq.\eqref{eq:generalization-error-bound}.
+
+    When $\Theta = B_1(\bs{\theta}_0, \gamma)$, with probability at least $1-\delta$, 
+    \begin{align}
+        R(f_{\bth}) - \hat{R}_N(f_{\bth})
+        &\leq 2LC\left\{
+            \frac1N +
+            \sqrt{\frac{2m\log(6\gamma NC)}{N}}
+        \right\}
+        + 3LC\sqrt{\frac{2\log(2/\delta)}{N}}
+    \end{align}
+    When $\Theta = \set{(\theta_1, \theta_2,\ldots, \theta_m)}[\theta_i \in [a_i, a_i+c_i],\, a_i,c_i \in \bbR] \subset \bbR^m$, with probability at least $1-\delta$,
+    \begin{align}
+        R(f_{\bth}) - \hat{R}_N(f_{\bth})
+        &\leq 2LC\left\{
+            \frac1N +
+            \sqrt{\frac{2\sum_{i=1}^{T}\log(1 + 2NC m c_i)}{N}}
+        \right\}
+        + 3LC\sqrt{\frac{2\log(2/\delta)}{N}}
+    \end{align}
+
+
+
+\subsection{Chaining bound}
+Since $\underset{\bs{f}_{\bth} \in \calF\bullet\calS}{\max}\norm{\bs{f}_{\bth}}_{p,N} \leq \qty(\frac1N \sum_{i=1}^N C^p)^{\frac1p} = C$, from the chaining bound in Theorem \ref{thm:chaining-bound-2}, we have
+\begin{align}
+    \frakR(\calF\bullet\calS)
+    \leq \inf_{\vep \in (0, \frac{C}{2}]}
+    \qty{
+        4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac{C}{2}} \mathrm{d}\vep' \sqrt{\log{N(\calF\bullet\calS, \vep', \norm{\cdot}_{p,N})}}
+    }
+\end{align}
+
+By using $N(\calF\bullet\calS, \vep, \norm{\cdot}_{p,N}) \leq N(\Theta, \vep/C, \norm{\cdot}_1)$
+\begin{align}
+    \frakR(\calF\bullet\calS)
+    &\leq \inf_{\vep \in (0, \frac{C}{2}]}
+    \qty{
+        4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac{C}{2}} \mathrm{d}\vep' \sqrt{\log{N(\Theta, \vep'/C, \norm{\cdot}_1)}}
+    } \quad \because \text{Eq.\eqref{eq:covering-number-bound-params}}\\
+    &= \inf_{\vep \in (0, \frac{C}{2}]}
+    \qty{
+        4\vep + C \frac{12}{\sqrt{N}} \int_{\vep/C}^{\frac12} \mathrm{d}\vep' \sqrt{\log{N(\Theta, \vep', \norm{\cdot}_1)}}
+    } \quad \because \vep' \to C\vep'\\
+    &= C \inf_{\vep \in (0, \frac12]}
+    \qty{
+        4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac12} \mathrm{d}\vep' \sqrt{\log{N(\Theta, \vep', \norm{\cdot}_1)}}
+    } \quad \because \vep \to C\vep
+\end{align}
+
+
+If $\Theta = B_1(\bs{\theta}_0, \gamma)$, then from Eq.\eqref{eq:covering-number-norm-ball-1} we have
+\begin{align}
+    \frakR(\calF\bullet\calS)
+    &\leq C\inf_{\vep \in (0, \frac12]}
+    \qty{
+        4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac12} \mathrm{d}\vep'
+        \sqrt{m\log\left(\frac{3\gamma C}{\vep'}\right)}
+    }
+\end{align}
+
+If $\Theta = \set{(\theta_1, \theta_2,\ldots, \theta_m)}[\theta_i \in [a_i, a_i+c_i],\, a_i,c_i \in \bbR] \subset \bbR^m$, then from Eq.\eqref{eq:covering-number-norm-ball-infty} we have
+\begin{align}
+    \frakR(\calF\bullet\calS)
+    &\leq C\inf_{\vep \in (0, \frac12]}
+    \qty{
+        4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac12} \mathrm{d}\vep' \sqrt{\log\prod_{i=1}^{T} \left(\frac{1 + C m c_i}{\vep'}\right)}
+    }
+    % &= \frac{24}{\sqrt{N}} \int_{0}^{\frac12} \mathrm{d}\vep' \sqrt{\log\prod_{i=1}^{T} \left(\frac{1 + C m c_i}{\vep'}\right)}\\
+\end{align}
+
+
+By using Eq.\eqref{eq:generalization-error-bound}, we have
+
+    When $\Theta = B_1(\bs{\theta}_0, \gamma)$, with probability at least $1-\delta$, 
+    \begin{align}
+        R(f_{\bth}) - \hat{R}_N(f_{\bth})
+        &\leq 2LC\inf_{\vep \in (0, \frac12]}
+        \qty{
+            4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac12} \mathrm{d}\vep' \sqrt{m\log\left(\frac{3\gamma C}{\vep'}\right)}
+        }
+        + 3LC\sqrt{\frac{2\log(2/\delta)}{N}}
+    \end{align}
+    When $\Theta = \set{(\theta_1, \theta_2,\ldots, \theta_m)}[\theta_i \in [a_i, a_i+c_i],\, a_i,c_i \in \bbR] \subset \bbR^m$, with probability at least $1-\delta$, 
+    \begin{align}
+        R(f_{\bth}) - \hat{R}_N(f_{\bth})
+        &\leq 2LC\inf_{\vep \in (0, \frac12]}
+        \qty{
+            4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac12} \mathrm{d}\vep' \sqrt{\log\prod_{i=1}^{T} \left(\frac{1 + C m c_i}{\vep'}\right)}
+        }
+        + 3LC\sqrt{\frac{2\log(2/\delta)}{N}}
+    \end{align}
+
+
+
+\subsection{Evaluation of the integral}
+
+    We consider the integral $\int \sqrt{a - \log{x}}\,\mathrm{d}x$. Let $u = \sqrt{a - \log{x}}$, then $x = e^{a - u^2}$ and $\mathrm{d}x = -2u e^{a - u^2}\,\mathrm{d}u$. Then, we have
+    \[
+        \int \sqrt{a - \log{x}}\,\mathrm{d}x
+        = -2\int u^2 e^{a - u^2}\,\mathrm{d}u
+    \]
+    Since $\dv{u}(-u e^{a - u^2}) = - e^{a - u^2} + 2u^2 e^{a - u^2}$, 
+    \begin{align}
+        -2\int u^2 e^{a - u^2}\,\mathrm{d}u
+        &= u e^{a - u^2} - e^a\int e^{- u^2}\,\mathrm{d}u\\
+        &= u e^{a - u^2} - e^a\frac{\sqrt{\pi}}{2}\erf(u) + \const\\
+        &= x\sqrt{a - \log{x}} - e^a\frac{\sqrt{\pi}}{2}\erf(\sqrt{a - \log{x}}) + \const\\
+        &= x\sqrt{a - \log{x}} + e^a\frac{\sqrt{\pi}}{2}\mathrm{erfc}(\sqrt{a - \log{x}}) + \const \quad (\mathrm{erfc}(x) \defeq 1 - \erf(x))
+    \end{align}
+
+
+
+We define $w(\vep) \defeq 4\vep + \frac{12}{\sqrt{N}} \int_{\vep}^{\frac12} \mathrm{d}\vep' \sqrt{\log\prod_{i=1}^{T} \left(\frac{1 + C m c_i}{\vep'}\right)}$ and $a \defeq \log\prod_{i=1}^{T}(1 + C m c_i)^{\frac1T}$.
+Convensionally, $\vep$ is taken as $0$, so we have
+\begin{align}
+    w(0)
+    &=12\sqrt{\frac{T}{N}}\int_{0}^{\frac12} \mathrm{d}\vep' \sqrt{a - \log\vep'}\\
+    &= 12\sqrt{\frac{T}{N}}\qty[
+        \frac12\sqrt{a + \log{2}}
+        + \frac{\sqrt{\pi}}{2} e^a\,\mathrm{erfc}(\sqrt{a + \log{2}})
+    ]\\
+    &\leq 12\sqrt{\frac{T}{N}}\qty[
+        \frac12\sqrt{a + \log{2}}
+        + \frac{\sqrt{\pi}}{2} e^a\,e^{- a - \log{2}}
+    ] \qquad (\mathrm{erfc}(x) \leq e^{-x^2})\\
+    &= 6\sqrt{
+        \frac1N\sum_{i=1}^{T} \log(1 + C m c_i) + \frac{T}{N}\log{2}
+    }
+    + 3\sqrt{\pi}\sqrt{\frac{T}{N}}
+\end{align}
+
+
+Thus, using Eq.\eqref{eq:generalization-error-bound}, we have
+
+    \begin{align}
+        R(f_{\bth}) - \hat{R}_N(f_{\bth})
+        &\leq
+        12LC\sqrt{
+            \frac1N\sum_{i=1}^{T} \log(1 + C m c_i) + \frac{T}{N}\log{2}
+        }
+        + 6LC\sqrt{\pi}\sqrt{\frac{T}{N}}
+        + 3LC\sqrt{\frac{2\log(2/\delta)}{N}}
+    \end{align}
+
+
+% Note that in [31], a generalization error without the reduced-domain initialization is given as
+% \begin{align}\label{eq:generalization-error-in-31}
+%     R(f_{\bth}) - \hat{R}_N(f_{\bth})
+%     \leq 192C\qty(
+%         \sqrt{\frac{2T\log{6T}}{N}}+\sqrt{\frac{\sum_{i=1}^{T} \log{M_t}}{2N}}
+%     )
+%     + 3LC \sqrt{\frac{2\log(2/\delta)}{N}}
+% \end{align}
+
+\quad\linebreak
+To get a more refined bound, we evaluate the minimum of $w(\vep)$.
+The derivative of $w(\vep)$ is
+\begin{align}
+    w'(\vep) &= 4 - \frac{12}{\sqrt{N}} \sqrt{\log\prod_{i=1}^{T} \left(\frac{1 + C m c_i}{\vep}\right)}
+\end{align}
+
+The minimum of $w(\vep)$ is obtained when $w'(\vep) = 0$, i.e.,
+\begin{align}
+    \sqrt{\log\prod_{i=1}^{T} \left(\frac{1 + C m c_i}{\vep}\right)} = \frac{\sqrt{N}}{3}
+    \iff \vep = e^{a - \frac{N}{9T}} \quad (\leq 1/2)
+\end{align}
+
+
+Thus, the minimum of $w(\vep)$ is
+\begin{align}
+    w\qty(e^{a - \frac{N}{9T}})
+    &= 4e^{a - \frac{N}{9T}} + \frac{12}{\sqrt{N}} \int_{e^{a - \frac{N}{9T}}}^{\frac12} \mathrm{d}\vep' \sqrt{\log\prod_{i=1}^{T} \left(\frac{1 + C m c_i}{\vep'}\right)}
+\end{align}
+
+The integral can be evaluated as
+\begin{align}
+    \int_{e^{a - \frac{N}{9T}}}^{\frac12} \mathrm{d}\vep' \sqrt{\log\prod_{i=1}^{T} \left(\frac{1 + C m c_i}{\vep'}\right)}
+    &=\sqrt{T}\int_{e^{a - \frac{N}{9T}}}^{\frac12} \mathrm{d}\vep' \sqrt{a - \log\vep'}
+    \qquad (a = \log\prod_{i=1}^{T}(1 + C m c_i)^{\frac1T})\\
+    &= \sqrt{T}\qty[
+        \vep'\sqrt{a - \log{\vep'}}
+        + \frac{\sqrt{\pi}}{2} e^a\,\mathrm{erfc}(\sqrt{a - \log{\vep'}})
+    ]_{e^{a - \frac{N}{9T}}}^{\frac12}
+    % &= \sqrt{T}\qty[
+    %     \frac12\sqrt{a + \log{2}}
+    %     + \frac{\sqrt{\pi}}{2} e^a\,\mathrm{erfc}(\sqrt{a + \log{2}})
+    % ]\\
+    % &- \sqrt{T}\qty[
+    %     e^{a - \frac{N}{9T}}\sqrt{\frac{N}{9T}}
+    %     + \frac{\sqrt{\pi}}{2} e^a\,\mathrm{erfc}\qty(\sqrt{\frac{N}{9T}})
+    % ]\\
+    % &\leq \sqrt{T}\qty[
+    %     \frac12\sqrt{a + \log{2}}
+    %     + \frac{\sqrt{\pi}}{2} e^a\,e^{- a - \log{2}}
+    % ]\\
+    % &- \sqrt{T}\qty[
+    %     e^{a - \frac{N}{9T}}\sqrt{\frac{N}{9T}}
+    %     + e^a\,\frac{e^{-\frac{N}{9T}}}{\sqrt{\frac{N}{9T}} + \sqrt{\frac{N}{9T} + 2}}
+    % ]\\
+    % & \qquad (2e^{-x^2}/(\sqrt{\pi}(x + \sqrt{x^2 + 2})) \leq \mathrm{erfc}(x) \leq e^{-x^2})\\
+    % & = \sqrt{T}\Bigg[
+    %     \frac12\sqrt{a + \log{2}} + \frac{\sqrt\pi}{4}
+    %     - e^{a - \frac{N}{9T}} \sqrt{\frac{N}{9T}}
+    %     - \frac{e^{a-\frac{N}{9T}}}{\sqrt{\frac{N}{9T}} + \sqrt{\frac{N}{9T} + 2}}
+    % \Bigg]\\
+    % &= \frac12 \sqrt{
+    %     \sum_{i=1}^{T} \log(1 + C m c_i) + T\log{2}
+    % }
+    % + \frac{\sqrt{\pi}}{4}\sqrt{T}
+    % - e^{a - \frac{N}{9T}}
+    % \frac{\sqrt{N}}{3}\\
+    % &\quad - \frac{e^{a-\frac{N}{9T}}}{\sqrt{\frac{N}{9T}} + \sqrt{\frac{N}{9T} + 2}}\sqrt{T}
+\end{align}
+
+
+Thus, 
+
+    \begin{align}
+        R(f_{\bth}) - \hat{R}_N(f_{\bth})
+        &\leq
+        2LC
+        \qty{
+            4\vep
+            + 12\sqrt{\frac{T}{N}}\qty[
+                \vep'\sqrt{a - \log{\vep'}}
+                + \frac{\sqrt{\pi}}{2} e^a\,\mathrm{erfc}(\sqrt{a - \log{\vep'}})
+            ]_{\vep}^{\frac12}
+        }
+        + 3LC\sqrt{\frac{2\log(2/\delta)}{N}}
+    \end{align}
+    , where $\vep=\min\qty{e^{a - \frac{N}{9T}},\frac12}$.
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=15cm]{upper-bound_interval.pdf}
+    \caption{Numerical evaluation of $\inf w(\vep)$ for $N=1000$, $m=2T$, $T=1,10,100,250,500,750,1000$}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=11cm]{upper-bound_01.pdf}
+    \caption{Numerical evaluation of $\inf w(\vep)$ for $N$ and $T$ with $m=2T, c_i = 0.1$}
+\end{figure}

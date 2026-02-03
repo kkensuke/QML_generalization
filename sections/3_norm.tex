@@ -1,0 +1,295 @@
+\section{Norm}
+In this section, we introduce the concept of norm and its properties. The $p$-norm extends the concept of the Euclidean norm, while the Schatten $p$-norm generalizes it to matrices.
+
+
+
+\begin{definition}[Norm]
+    Let $\calM$ be a linear space (vector space) over $\bbR$ or $\bbC$. A norm on $\calM$ is a function $\norm{\cdot} : \calM \to \bbR$ satisfying the following properties for any $\bs{x}, \bs{y} \in \calM$ and $c \in \bbR$ or $\bbC$:
+    \begin{enumerate}
+        \item (Positivity) $\norm{\bs{x}} \geq 0$ and $\norm{\bs{x}} = 0 \iff \bs{x} = \bs{0}$.
+        \item (Homogeneity) $\norm{c\bs{x}} = |c|\norm{\bs{x}}$.
+        \item (Triangle inequality) $\norm{\bs{x} + \bs{y}} \leq \norm{\bs{x}} + \norm{\bs{y}}$.
+    \end{enumerate}
+\end{definition}
+
+
+
+
+\begin{definition}[$p$-norm or $L^p$-norm]
+    Let $\bs{x} \defeq (x_1, x_2, \ldots, x_n) \in \bbR^n$ and $1 \leq p$. Then $p$-norm $\norm{\cdot}_p$ of $\bs{x}$ is defined as
+    \begin{align}
+        \norm{\bs{x}}_p
+        &\defeq
+        \begin{cases}
+            \qty(\sum_{i=1}^n |x_i|^p)^\frac1p & (1 \leq p < \infty)\\[5pt]
+            \max_{i} |x_i| & (p = \infty)
+        \end{cases}
+    \end{align}
+    and normalized $p$-norm $\norm{\bs{x}}_{p,n}$ is defined as
+    \begin{equation}
+        \norm{\bs{x}}_{p,n} \defeq \qty(\frac1n \sum_{i=1}^n |x_i|^p)^\frac1p = \frac{1}{n^\frac1p} \norm{\bs{x}}_p
+    \end{equation}
+\end{definition}
+
+
+
+
+
+
+\begin{lemma}[H\"{o}lder's inequality]\label{lem:holder-inequality}
+    Let $1 \leq p, q \leq \infty$ and $1/p + 1/q = 1$. Then, for any $\bs{x}, \bs{y} \in \bbR^n$,
+    \begin{equation}
+        \qty(|\!\ev{\bs{x}|\bs{y}}\!| := \abs{\sum_{i=1}^n x_i y_i} \leq)
+        \sum_{i=1}^n |x_i y_i| \leq \norm{\bs{x}}_p \norm{\bs{y}}_q
+    \end{equation}
+\end{lemma}
+
+
+
+\begin{lemma}[Inequality of $p$-norms]\label{lem:inequality-p-norms}
+    Let $1 \leq p \leq q$ and $\bs{x} \in \bbR^n$. The $p$-norm $\norm{\bs{x}}_p$ is decreasing in $p$, that is,
+    \begin{align}
+    \norm{\bs{x}}_\infty \leq \norm{\bs{x}}_q \leq \norm{\bs{x}}_p \leq \norm{\bs{x}}_1
+    \end{align}
+    
+    And any two $p$-norms are related as
+    \begin{align}
+    \norm{\bs{x}}_q \leq \norm{\bs{x}}_p \leq n^{(1/p - 1/q)}\norm{\bs{x}}_q
+    \end{align}
+    
+    In particular,
+    \begin{align}
+    & \norm{\bs{x}}_2 \leq\norm{\bs{x}}_1 \leq \sqrt{n}\norm{\bs{x}}_2 \\
+    & \norm{\bs{x}}_{\infty} \leq\norm{\bs{x}}_2 \leq \sqrt{n}\norm{\bs{x}}_{\infty} \\
+    & \norm{\bs{x}}_{\infty} \leq\norm{\bs{x}}_1 \leq n\norm{\bs{x}}_{\infty}
+    \end{align}
+    
+    % So,
+    % \begin{align}
+    % \norm{\bs{x}}_{\infty} \leq \cdots \leq \norm{\bs{x}}_2 \leq\norm{\bs{x}}_1 \leq \sqrt{n}\norm{\bs{x}}_2 \leq n\norm{\bs{x}}_{\infty} .
+    % \end{align}
+\end{lemma}
+
+\begin{proof}
+    \quad\par
+    (First inequality) For any $\bs{x} \in \bbR^n$, there exists $\bs{y} \in \bbR^n$ such that $\bs{x} = \norm{\bs{x}}_r \bs{y}$. Then, since $\norm{\bs{y}}_r = 1$
+    , for any $1 \leq r < p$,
+    \begin{align}
+        \norm{\bs{y}}_p^p = \sum_{i=1}^n |y_i|^p \leq \sum_{i=1}^n |y_i|^r = \norm{\bs{y}}_r^r = 1 \quad (\because t^p \leq t^r \text{ for } 0 \leq t \leq 1)
+        \implies \norm{\bs{y}}_p \leq 1
+    \end{align}
+    Therefore, $\norm{\bs{x}}_p = \norm{\bs{x}}_r\norm{\bs{y}}_p \leq \norm{\bs{x}}_r\norm{\bs{y}}_r = \norm{\bs{x}}_r$.
+    
+    (Second inequality) By H\"{o}lder's inequality,
+    \begin{align}
+        \sum\limits_{i=1}^n |a_i b_i|\leq
+        \left(\sum\limits_{i=1}^n|a_i|^r\right)^{\frac{1}{r}}\left(\sum\limits_{i=1}^n|b_i|^{\frac{r}{r-1}}\right)^{1-\frac{1}{r}}
+    \end{align}
+    Let $|a_i|=|x_i|^p, |b_i|=1$ and $r=q/p>1$. Then
+    \begin{align}
+        \norm{x}_p^p = 
+        \sum\limits_{i=1}^n |x_i|^p =
+        \sum\limits_{i=1}^n |x_i|^p\cdot 1\leq
+        \left(\sum\limits_{i=1}^n (|x_i|^p)^{\frac{q}{p}}\right)^{\frac{p}{q}}
+        \left(\sum\limits_{i=1}^n 1^{\frac{q}{q-p}}\right)^{1-\frac{p}{q}}=
+        \left(\sum\limits_{i=1}^n |x_i|^q\right)^{\frac{p}{q}} n^{1-\frac{p}{q}}
+    \end{align}
+    Therefore,
+    \begin{align}
+        \norm{x}_p=
+        \left(\sum\limits_{i=1}^n |x_i|^p\right)^{1/p}\leq
+        \left(\left(\sum\limits_{i=1}^n |x_i|^q\right)^{\frac{p}{q}} n^{1-\frac{p}{q}}\right)^{1/p}=
+        \left(\sum\limits_{i=1}^n |x_i|^q\right)^{\frac{1}{q}} n^{\frac{1}{p}-\frac{1}{q}}=
+        n^{1/p-1/q}\norm{x}_q
+    \end{align}
+\end{proof}
+
+\begin{remark}
+    Let $1 \leq r$. If $\norm{\bs{y}}_r = 1$($\iff \sum_{i=1}^n |y_i|^r = 1$), then $|y_i| \leq 1$ for any $i$. Because if there exists $y_i$ such that $1 < |y_i|$, then $\sum_{i=1}^n |y_i|^r > 1$.
+\end{remark}
+
+\begin{remark}
+    From the last inequality in the proof, we have
+    $\norm{x}_p \leq n^{1/p-1/q}\norm{x}_q \iff \norm{x}_{p,n} \leq \norm{x}_{q,n}$. Therefore, the normalized $p$-norm is increasing in $p$.
+\end{remark}
+
+
+
+\begin{definition}[Schatten $p$-norm]
+    Let $A \in \bbC^{m \times n}$ and $1 \leq p$. Then Schatten $p$-norm of $A$ is defined as
+    \begin{equation}
+        \norm{A}_p = 
+        \begin{cases}
+            \qty(\Tr[\abs{A}^p])^{\frac1p} = \qty(\sum_{i=1}^{\min\{m,n\}} \sigma_i^p)^\frac1p & (1 \leq p < \infty) \\
+            \sigma_1 & (p = \infty)
+        \end{cases}
+    \end{equation}
+    , where $\abs{A} = \sqrt{A\dg A}$ and $\sigma_i$ is the $i$-th largest singular value of $A$ (i.e., the $i$-th largest eigenvalue of $|A|$). 
+\end{definition}
+
+
+\begin{remark}
+\quad\par
+\begin{itemize}
+    \item When $p=1$, the Schatten $1$-norm is called the trace norm or nuclear norm.
+    \item When $p=2$, the Schatten $2$-norm is called the Frobenius norm or Hilbert-Schmidt norm.
+    \item When $p=\infty$, the Schatten $\infty$-norm is called the operator norm or spectral norm.
+\end{itemize}
+\end{remark}
+
+
+
+\begin{lemma}[Properties of Schatten $p$-norm]
+Let $A, B \in \calL(\calH)$ and $1 \leq p \leq q \leq \infty$. The Schatten $p$-norm has the following properties.
+\begin{itemize}
+    \item For any $p \leq q$, $\norm{A}_q \leq \norm{A}_p$.
+    \item For any $p \in [1, \infty]$ and $U,V\in\calU(d)$, $\norm{UAV\dg}_p = \norm{A}_p$.
+    \item $\norm{A}_p = \norm{A\T}_p = \norm{A^*}_p = \norm{A\dg}_p$.
+    \item For any $p, q, r$ and $1/p + 1/q \leq 1/r$, $\norm{AB}_r \leq \norm{A}_p \norm{B}_q$ (H\"older's inequality).
+    \begin{itemize}
+        \item $\norm{AB}_1 \leq \norm{A}_1 \norm{B}_\infty$.
+        \item $\norm{AB}_1 \leq \norm{A}_2 \norm{B}_2$.
+    \end{itemize}
+\end{itemize}
+\end{lemma}
+
+
+
+
+
+
+\begin{definition}[norm ball]
+    Let $(\calM, \norm{\cdot})$ be a norm space.
+    A norm ball centered at $\bs{x} \in \calM$ with radius $0 < \vep$ is defined as
+    \begin{equation}
+        B(\bs{x}, \vep, \norm{\cdot}) \defeq \set{\bs{y} \in \calM}[\norm{\bs{y}-\bs{x}} \leq \vep]
+    \end{equation}
+\end{definition}
+
+
+\begin{remark}
+    When $p$-norm is used, we call it $p$-norm ball and denote it as $B_p(\bs{x}, \vep)$.
+    From the Fig. \ref{fig:p-norm-contours_1}, we can see that $B_{1}(\bs{x}, \vep) \subset B_{p}(\bs{x}, \vep) \subset B_{q}(\bs{x}, \vep) \subset B_{\infty}(\bs{x}, \vep)$ for $1 \leq p \leq q \leq \infty$.
+\end{remark}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{p_norm_contours_1.pdf}
+    \caption{The contours of $p$-norm balls with $\vep = 1$ in $\bbR^{2}$ for $p = 1, 2, 3, \infty$.}
+    \label{fig:p-norm-contours_1}
+\end{figure}
+
+
+
+
+
+\begin{definition}[Diamond norm]
+    Let $\calE : \calL(\calH_1) \to \calL(\calH_2)$ be a linear map. The diamond norm of $\calE$ is defined as
+    \begin{align}
+        \norm{\calE}_\diamond
+        &\defeq \sup_{n\in\bbN}\sup_{\norm{A}_1 \leq 1} \norm{(\calE \otimes \bbid_{\bbC^{n}})(A)}_1\\
+        &= \sup \set{\norm{(\calE  \otimes \bbid_{\calH_1})(\dyad{\psi}{\phi})}_1}[ \ket{\psi}, \ket{\phi} \in \calH_1 \otimes \calH_1]
+    \end{align}
+\end{definition}
+
+
+\begin{remark}
+    \quad\par
+    \begin{itemize}
+        \item When $\calE$ is a quantum channel, or a completely positive and trace-preserving (CPTP) map, the diamond norm is $\norm{\calE}_\diamond = 1$.
+        \item If the map $\calE$ is Hermiticity-preserving (e.g. $\calE$ is the difference of two quantum channels), one can optimize over $\ket{\psi} = \ket{\phi}$ in the formula above.
+        \item Refer to Ref.~\cite{kliesch2021theory} or Ref.~\cite{nechita2018almost} for further details on the diamond norm.
+    \end{itemize}
+\end{remark}
+
+
+
+
+
+\begin{lemma}[Subadditivity of diamond distance \cite{wang2023enhanced}]\label{lem:subadditivity-diamond-distance}
+    For any quantum channels $\calE_1, \calE_2, \calE_3, \calE_4$, where $\calE_2$ and $\calE_4$ map from $n$-qubit to $m$-qubit systems and $\calE_1$ and $\calE_3$ map from $m$-qubit to $k$-qubit systems, we have
+    \begin{equation}
+        \norm{\calE_1\circ\calE_2 - \calE_3\circ\calE_4}_\diamond \leq \norm{\calE_1 - \calE_3}_\diamond + \norm{\calE_2 - \calE_4}_\diamond
+    \end{equation}
+    , where $\norm{\cdot}_\diamond$ denotes the diamond norm of a quantum channel.
+\end{lemma}
+
+
+\begin{proof}
+    \begin{align}
+        \norm{\calE_1\circ\calE_2 - \calE_3\circ\calE_4}_\diamond
+        &= \norm{\calE_1\circ\calE_2 - \calE_3\circ\calE_2 + \calE_3\circ\calE_2 - \calE_3\circ\calE_4}_\diamond \\
+        &= \norm{(\calE_1 - \calE_3)\circ\calE_2} + \norm{\calE_3\circ(\calE_2 - \calE_4)}_\diamond \\
+        &\leq \norm{\calE_1 - \calE_3}_\diamond\norm{\calE_2}_\diamond + \norm{\calE_3}_\diamond\norm{\calE_2 - \calE_4}_\diamond \\
+        &\leq \norm{\calE_1 - \calE_3}_\diamond + \norm{\calE_2 - \calE_4}_\diamond
+    \end{align}
+\end{proof}
+
+
+
+\begin{lemma}[Spectral norm and diamond norm of unitary channels \cite{wang2023enhanced}]\label{lem:unitary-channel-distance}
+    Let $\calE_U(\rho) = U\rho U\dg$ and $\calE_V(\rho) = V\rho V\dg$ be unitary channels.
+    Then, $$\norm{\calE_U - \calE_V}_\diamond \leq 2\norm{U - V}_\infty$$ where $\norm{\cdot}_\infty$ is the Schatten $\infty$-norm.
+\end{lemma}
+
+
+\begin{proof}
+    For any $\ket{u}, \ket{v} \in \calH$, we have $\ket{v} = a\ket{u} + b\ket{u^\perp}$, where $\ket{u^\perp}$ is orthogonal to $\ket{u}$ and $|a|^2 + |b|^2 = 1$.
+    Then,
+    \begin{align}
+        \dyad{u} - \dyad{v}
+        &= \dyad{u} - (a\ket{u} + b\ket{u^\perp})(a^*\bra{u} + b^*\bra{u^\perp}) \\
+        &= \dyad{u} - |a|^2\dyad{u} - |b|^2\dyad{u^\perp} - ab^*\dyad{u}{u^\perp} - a^*b\dyad{u^\perp}{u}\\
+        &= \mqty(1-|a|^2 & -ab^* \\ -a^*b & -|b|^2)\\
+        &= \mqty(|b|^2 & -ab^* \\ -a^*b & -|b|^2)
+    \end{align}
+    Since
+    \begin{align}
+        &\det(\lambda I - (\dyad{u} - \dyad{v})) = 0\\
+        \iff &\lambda^2 - (|a|^2 + |b|^2)|b|^2 = 0\\
+        \iff &\lambda^2 - |b|^2 = 0\\
+        \iff &\lambda = \pm|b| = \pm\sqrt{1-|a|^2} = \pm\sqrt{1-|\ev{u|v}|^2}
+    \end{align}
+    , and trace norm is the sum of singular values, we have
+    \begin{align}
+    \frac12 \norm{\dyad{u} - \dyad{v}}_1
+    &= \sqrt{1-|\ev{u|v}|^2} \\
+    &= \sqrt{(1+|\ev{u|v}|)(1-|\ev{u|v}|)} \\
+    &\leq \sqrt{2(1-\Re(\ev{u|v}))} \\
+    &= \norm{\ket{u} - \ket{v}}_2
+    \end{align}
+    The last equality is due to the fact that
+    \[
+        \norm{\ket{u} - \ket{v}}_2 = \sqrt{(\bra{u} - \bra{v})(\ket{u} - \ket{v})} = \sqrt{2 - \ev{u|v} - \ev{v|u}} = \sqrt{2(1-\Re(\ev{u|v}))}.
+    \]
+    
+    The diamond distance bound then is a direct consequence of this relation.
+    \begin{align}
+    \frac{1}{2}\norm{\calE_U - \calE_V}_\diamond
+    &= \sup_{\dyad{\psi}} \frac{1}{2} \norm{\calE_U(\dyad{\psi}) - \calE_V(\dyad{\psi})}_1 \\
+    &\leq \sup_{\ket{\psi}} \norm{(U-V)\ket{\psi}}_2 \\
+    &= \text{largest singular value of } U-V \\
+    &= \norm{U-V}_\infty
+    \end{align}
+\end{proof}
+
+
+
+The following lemma translates the distance of rotation operators to the distance of their corresponding angles.
+
+\begin{lemma}[\cite{wang2023enhanced}]\label{lem:rotation-operator-distance}
+    Given an arbitrary Pauli matrix $P \in$ $\{I, X, Y, Z\}$ and two arbitrary angles $\th$ and $\tilde{\th}$, the corresponding 1-qubit rotation operators are $R(\th)=e^{-\frac{i}{2} \th P}$ and $R(\tilde{\th})=e^{-\frac{i}{2} \tilde{\th} P}$, respectively. Then, the distance between the two operators measured by the Schatten $\infty$-norm can be upper bounded as
+    \begin{equation}
+        \|R(\th)-R(\tilde{\th})\|_{\infty} \leq \frac{1}{2}|\th-\tilde{\th}|
+    \end{equation}
+\end{lemma}
+
+
+\begin{proof}
+    According to the definition of rotation operators, we have
+    $R(\th)-R(\tilde{\th})=\left(\cos \frac{\th}{2}-\cos \frac{\tilde{\th}}{2}\right) I-i\left(\sin \frac{\th}{2}-\sin \frac{\tilde{\th}}{2}\right) P$,
+    whose singular value is $2 \sin \frac{\th-\tilde{\th}}{4}$ with the multiplicity 2. Thus,
+    \begin{equation}
+        \|R(\th)-R(\tilde{\th})\|_{\infty}=2 \abs{\sin \frac{\th-\tilde{\th}}{4}} \leq \frac{1}{2}|\th-\tilde{\th}|
+    \end{equation}
+\end{proof}

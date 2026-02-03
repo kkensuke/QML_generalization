@@ -1,0 +1,419 @@
+% ---------------------------------------------------------------------------- %
+% Essential Packages
+% ---------------------------------------------------------------------------- %
+\usepackage[T1]{fontenc}             % Ensures proper encoding for PDF output.
+\usepackage{amsmath, amsfonts, amssymb, amsthm} % For advanced mathematical typesetting.
+\usepackage{mathtools}               % Enhances amsmath, e.g., for \coloneqq and showonlyrefs.
+\usepackage[many]{tcolorbox}         % For colored boxes around text, the 'many' option loads many libraries.
+% \mathtoolsset{showonlyrefs=true}     % Number only referenced equations.
+
+
+% ---------------------------------------------------------------------------- %
+% Graphics and Colors
+% ---------------------------------------------------------------------------- %
+\usepackage{xcolor}
+\usepackage{graphicx}                % For including images.
+\usepackage{tikz}                    % For creating vector graphics in LaTeX.
+\usepackage{quantikz}
+\usetikzlibrary{3d}                  % Adds 3D functionalities to TikZ.
+
+
+% ---------------------------------------------------------------------------- %
+% Lists and Enumerations
+% ---------------------------------------------------------------------------- %
+\usepackage{enumitem}                % Control over itemize, enumerate, and description.
+
+
+% ---------------------------------------------------------------------------- %
+% Tables
+% ---------------------------------------------------------------------------- %
+\usepackage{multirow}                % Allows for multi-row cells in tables.
+\usepackage{longtable}
+\usepackage{booktabs}                % For professional-looking tables
+
+
+% ---------------------------------------------------------------------------- %
+% Other Packages
+% ---------------------------------------------------------------------------- %
+\usepackage{physics}                 % For simplifying notation in physics.
+\usepackage{nicefrac}                % For creating "nice" fractions with \nicefrac.
+\usepackage{verbatim}                % For including raw text or comments.
+\usepackage{ascmac}                  % For creating boxed text.
+\usepackage[linesnumbered, ruled, vlined]{algorithm2e} % For typesetting algorithms. This package should be loaded after ascmac.
+\SetKwInput{kwInit}{Init}            % Custom keyword for initialization in algorithms.
+\usepackage[normalem]{ulem}          % For underlining and strikeout (sout).
+\usepackage{fontawesome}             % For including icons in the document.
+\usepackage{wrapfig}                % For wrapping text around figures.
+\usepackage[top=25truemm,bottom=20truemm,left=20truemm,right=20truemm]{geometry}                % For setting page dimensions and margins.
+
+
+% ---------------------------------------------------------------------------- %
+% Page Layout and Formatting
+% ---------------------------------------------------------------------------- %
+\allowdisplaybreaks[4]               % Allows page breaks in multiline equations.
+\usepackage{float}                   % Improved control over figure and table placement.
+
+
+% ---------------------------------------------------------------------------- %
+% Theorems, Lemmas, etc.
+% ---------------------------------------------------------------------------- %
+\usepackage{apptools}                % Extends the functionality of theorem environments in appendices.
+\usepackage{appendix}                % Manage appendices in the document.
+\usepackage{titlesec}                % Customization of section titles.
+
+
+% ---------------------------------------------------------------------------- %
+% Hyperlinks
+% ---------------------------------------------------------------------------- %
+\usepackage[colorlinks=true,citecolor=green,linkcolor=blue]{hyperref}
+
+
+% ---------------------------------------------------------------------------- %
+% Theorem Environments
+% ---------------------------------------------------------------------------- %
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
+\newtheorem{example}{Example}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{remark}{Remark}
+\newtheorem{problem}{Problem}
+\newtheorem{property}{Property}
+
+\AtAppendix{%
+    \counterwithin{theorem}{section}
+    \counterwithin{corollary}{section}
+    \counterwithin{lemma}{section}
+    \counterwithin{proposition}{section}
+    \counterwithin{definition}{section}
+    \counterwithin{assumption}{section}
+    \counterwithin{remark}{section}
+    \counterwithin{example}{section}
+    \counterwithin{property}{section}
+    \counterwithin{problem}{section}
+}
+
+% colored box for theorem environment
+\tcolorboxenvironment{definition}{
+    colback=gray!20!white,
+    boxrule=0pt,
+    boxsep=1pt,
+    left=5pt,right=5pt,top=5pt,bottom=5pt,
+    oversize=2pt,
+    sharp corners,
+    before skip=\topsep,
+    after skip=\topsep,
+    breakable
+}
+\tcolorboxenvironment{assumption}{
+    colback=gray!20!white,
+    boxrule=0pt,
+    boxsep=1pt,
+    left=5pt,right=5pt,top=5pt,bottom=5pt,
+    oversize=2pt,
+    sharp corners,
+    before skip=\topsep,
+    after skip=\topsep,
+    breakable
+}
+\tcolorboxenvironment{proposition}{
+    colback=gray!20!white,
+    boxrule=0pt,
+    boxsep=1pt,
+    left=5pt,right=5pt,top=5pt,bottom=5pt,
+    oversize=2pt,
+    sharp corners,
+    before skip=\topsep,
+    after skip=\topsep,
+    breakable
+}
+\tcolorboxenvironment{theorem}{
+    colback=blue!20!white,
+    boxrule=0pt,
+    boxsep=1pt,
+    left=5pt,right=5pt,top=5pt,bottom=5pt,
+    oversize=2pt,
+    sharp corners,
+    before skip=\topsep,
+    after skip=\topsep,
+    breakable
+}
+\tcolorboxenvironment{corollary}{
+    colback=blue!20!white,
+    boxrule=0pt,
+    boxsep=1pt,
+    left=5pt,right=5pt,top=5pt,bottom=5pt,
+    oversize=2pt,
+    sharp corners,
+    before skip=\topsep,
+    after skip=\topsep,
+    breakable
+}
+\tcolorboxenvironment{lemma}{
+    colback=gray!20!white,
+    boxrule=0pt,
+    boxsep=1pt,
+    left=5pt,right=5pt,top=5pt,bottom=5pt,
+    oversize=2pt,
+    sharp corners,
+    before skip=\topsep,
+    after skip=\topsep,
+    breakable
+}
+
+
+% ---------------------------------------------------------------------------- %
+% Comments and Revisions
+% ---------------------------------------------------------------------------- %
+% revision commenting tools
+\newcommand{\stkout}[1]{\ifmmode\text{\sout{\ensuremath{#1}}}\else\sout{#1}\fi}
+\newif\ifverbose
+\verbosetrue                         % Toggle to show or hide corrections.
+% ins: stuff that is new
+\newcommand{\ins}[1]{\ifverbose\textcolor{blue}{#1}\else#1\fi}
+% edit: stuff that has been replaced with other stuff
+\newcommand{\edit}[2]{\ifverbose\textcolor{red}{\stkout{#1} #2}\else#2\fi}
+% del: stuff that has been removed
+\newcommand{\del}[1]{\ifverbose\textcolor{red}{\stkout{#1}}\fi}
+
+
+% ---------------------------------------------------------------------------- %
+% Latin abbreviations
+% ---------------------------------------------------------------------------- %
+\newcommand{\eg}{\text{e.g.,\ }}
+\newcommand{\ie}{\text{i.e.,\ }}
+\newcommand{\wrt}{\text{w.r.t.\ }}
+\newcommand{\iid}{\text{i.i.d.\ }}
+
+
+% ---------------------------------------------------------------------------- %
+% Mathematical Shortcuts
+% ---------------------------------------------------------------------------- %
+% mathbb capital letters
+\newcommand{\bbA}{\mathbb{A}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbC}{\mathbb{C}}
+\newcommand{\bbD}{\mathbb{D}}
+\newcommand{\bbE}{\mathbb{E}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbG}{\mathbb{G}}
+\newcommand{\bbH}{\mathbb{H}}
+\newcommand{\bbI}{\mathbb{I}}
+\newcommand{\bbJ}{\mathbb{J}}
+\newcommand{\bbK}{\mathbb{K}}
+\newcommand{\bbL}{\mathbb{L}}
+\newcommand{\bbM}{\mathbb{M}}
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\bbO}{\mathbb{O}}
+\newcommand{\bbP}{\mathbb{P}}
+\newcommand{\bbQ}{\mathbb{Q}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbS}{\mathbb{S}}
+\newcommand{\bbT}{\mathbb{T}}
+\newcommand{\bbU}{\mathbb{U}}
+\newcommand{\bbV}{\mathbb{V}}
+\newcommand{\bbW}{\mathbb{W}}
+\newcommand{\bbX}{\mathbb{X}}
+\newcommand{\bbY}{\mathbb{Y}}
+\newcommand{\bbZ}{\mathbb{Z}}
+
+% \mathrm capital letters
+\newcommand{\rmA}{\mathrm{A}}
+\newcommand{\rmB}{\mathrm{B}}
+\newcommand{\rmC}{\mathrm{C}}
+\newcommand{\rmD}{\mathrm{D}}
+\newcommand{\rmE}{\mathrm{E}}
+\newcommand{\rmF}{\mathrm{F}}
+\newcommand{\rmG}{\mathrm{G}}
+\newcommand{\rmH}{\mathrm{H}}
+\newcommand{\rmI}{\mathrm{I}}
+\newcommand{\rmJ}{\mathrm{J}}
+\newcommand{\rmK}{\mathrm{K}}
+\newcommand{\rmL}{\mathrm{L}}
+\newcommand{\rmM}{\mathrm{M}}
+\newcommand{\rmN}{\mathrm{N}}
+\newcommand{\rmO}{\mathrm{O}}
+\newcommand{\rmP}{\mathrm{P}}
+\newcommand{\rmQ}{\mathrm{Q}}
+\newcommand{\rmR}{\mathrm{R}}
+\newcommand{\rmS}{\mathrm{S}}
+\newcommand{\rmT}{\mathrm{T}}
+\newcommand{\rmU}{\mathrm{U}}
+\newcommand{\rmV}{\mathrm{V}}
+\newcommand{\rmW}{\mathrm{W}}
+\newcommand{\rmX}{\mathrm{X}}
+\newcommand{\rmY}{\mathrm{Y}}
+\newcommand{\rmZ}{\mathrm{Z}}
+
+% \mathcal capital letters
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calJ}{\mathcal{J}}
+\newcommand{\calK}{\mathcal{K}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calN}{\mathcal{N}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calQ}{\mathcal{Q}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calT}{\mathcal{T}}
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calV}{\mathcal{V}}
+\newcommand{\calW}{\mathcal{W}}
+\newcommand{\calX}{\mathcal{X}}
+\newcommand{\calY}{\mathcal{Y}}
+\newcommand{\calZ}{\mathcal{Z}}
+
+% mathfrak capital letters
+\newcommand{\frakA}{\mathfrak{A}}
+\newcommand{\frakB}{\mathfrak{B}}
+\newcommand{\frakC}{\mathfrak{C}}
+\newcommand{\frakD}{\mathfrak{D}}
+\newcommand{\frakE}{\mathfrak{E}}
+\newcommand{\frakF}{\mathfrak{F}}
+\newcommand{\frakG}{\mathfrak{G}}
+\newcommand{\frakH}{\mathfrak{H}}
+\newcommand{\frakI}{\mathfrak{I}}
+\newcommand{\frakJ}{\mathfrak{J}}
+\newcommand{\frakK}{\mathfrak{K}}
+\newcommand{\frakL}{\mathfrak{L}}
+\newcommand{\frakM}{\mathfrak{M}}
+\newcommand{\frakN}{\mathfrak{N}}
+\newcommand{\frakO}{\mathfrak{O}}
+\newcommand{\frakP}{\mathfrak{P}}
+\newcommand{\frakQ}{\mathfrak{Q}}
+\newcommand{\frakR}{\mathfrak{R}}
+\newcommand{\frakS}{\mathfrak{S}}
+\newcommand{\frakT}{\mathfrak{T}}
+\newcommand{\frakU}{\mathfrak{U}}
+\newcommand{\frakV}{\mathfrak{V}}
+\newcommand{\frakW}{\mathfrak{W}}
+\newcommand{\frakX}{\mathfrak{X}}
+\newcommand{\frakY}{\mathfrak{Y}}
+\newcommand{\frakZ}{\mathfrak{Z}}
+
+
+
+% mathrm
+\newcommand{\const}{\mathrm{const.}}
+\newcommand{\hc}{\mathrm{h.c.}}
+\newcommand{\lhs}{\mathrm{(LHS)}}
+\newcommand{\rhs}{\mathrm{(RHS)}}
+\newcommand{\Haar}{\mathrm{Haar}}
+\newcommand{\poly}{\mathrm{poly}}
+\newcommand{\SWAP}{\mathrm{SWAP}}
+\newcommand{\CNOT}{\mathrm{CNOT}}
+\newcommand{\CZ}{\mathrm{CZ}}
+\newcommand{\HS}{\mathrm{HS}}
+
+% MathOperator
+\DeclareMathOperator*{\argmin}{arg~min}
+\DeclareMathOperator*{\argmax}{arg~max}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\Supp}{Supp}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator*\bigcircop{\bigcirc}
+
+% others
+\renewcommand{\bar}[1]{\overline{#1}}
+\renewcommand{\th}{\theta}
+\newcommand{\ind}{\,\mathrm{d}}
+\newcommand{\us}[2]{\underset{#2}{#1}}
+\newcommand{\os}[2]{\overset{#2}{#1}}
+\newcommand{\bx}{\boldsymbol{x}}
+\newcommand{\by}{\boldsymbol{y}}
+\newcommand{\bth}{\boldsymbol{\theta}}
+\newcommand{\combi}[2]{{}_{#1}\text{C}_{#2}}
+\newcommand{\defeq}{\coloneqq}
+\newcommand{\dg}{^\dagger}
+\newcommand{\mdg}{^{-\dagger}}
+\newcommand{\T}{^\mathsf{T}}
+\newcommand{\mT}{^{-\mathsf{T}}}
+\newcommand{\prm}{^\prime}
+\newcommand{\pd}{\partial}
+\newcommand{\vt}{\,\|\,}
+\newcommand{\bs}{\boldsymbol}
+\newcommand{\kett}[1]{\ket*{#1}\!\rangle}
+\newcommand{\braa}[1]{\langle\!\!\bra*{#1}}
+\newcommand{\evv}[2]{\langle\!\langle{#1}|{#2}\rangle\!\rangle}
+\newcommand{\dyadd}[1]{\ket*{#1}\!\rangle\langle\!\!\bra*{#1}}
+\newcommand{\ot}{\otimes}
+\newcommand{\otn}[1]{^{\otimes {#1}}}
+\newcommand{\kten}[2]{\ket{#1}\otimes\ket{#2}}
+\newcommand{\bten}[2]{\bra{#1}\otimes\bra{#2}}
+\newcommand{\vep}{\varepsilon}
+\usepackage{dsfont}
+\newcommand{\bbid}{\mathds{1}}
+\newcommand{\memo}[1]{\textcolor{red}{(#1)}}
+% \NewDocumentCommand{\set}{m g}{%
+%     \IfNoValueTF{#2}{%
+%         \left\{\, #1 \,\right\}%
+%     }{%
+%     \left\{\, #1 ~\middle|~ #2 \,\right\}%
+%     }%
+% }
+\NewDocumentCommand{\set}{s m o}{%
+  \IfBooleanTF{#1}%
+    {%
+      \IfValueTF{#3}%
+        {\{~ #2 ~|~ #3 ~\}}%
+        {\{~ #2 ~\}}%
+    }%
+    {%
+      \IfValueTF{#3}%
+        {\left\{~ #2 ~\middle|~ #3 ~\right\}}%
+        {\left\{~ #2 ~\right\}}%
+    }%
+}
+% ---------------------------------------------------------------------------- %
+
+
+% physics
+% ---------------------------------------------------------------------------- %
+% matrix
+\newcommand{\paulii}{\mqty[\pmat{0}]}
+\newcommand{\paulix}{\mqty[\pmat{1}]}
+\newcommand{\pauliy}{\mqty[\pmat{2}]}
+\newcommand{\pauliz}{\mqty[\pmat{3}]}
+
+\newcommand{\rx}[1]{ \mqty[\cos \frac{#1}{2} & -i\sin\frac{#1}{2} \\ -i\sin \frac{#1}{2}& \cos\frac{#1}{2} ]}
+\newcommand{\ry}[1]{ \mqty[\cos \frac{#1}{2} & -\sin\frac{#1}{2}  \\ \sin \frac{#1}{2}  & \cos\frac{#1}{2} ]}
+\newcommand{\rz}[1]{ \mqty[e^{-i{#1}/2}      & 0                  \\ 0                  & e^{i{#1}/2}     ]}
+\newcommand{\rot}[1]{\mqty[\cos {#1}         & -\sin {#1}         \\ \sin {#1}          & \cos {#1} ]}
+
+\newcommand{\hadamard}{\frac{1}{\sqrt{2}}\mqty[1 & 1 \\ 1 & -1]}
+\newcommand{\phaseg}{\mqty[1 & 0 \\ 0 & i]}
+\newcommand{\tg}{\mqty[1 & 0 \\ 0 & e^{i\pi/4}]}
+\newcommand{\mswap}{\mqty[1 & 0 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1]}
+\newcommand{\mcnot}{\mqty[1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0]}
+\newcommand{\mcz}{\mqty[1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & -1]}
+
+% sin cos
+\newcommand{\sif}[2]{\sin\qty(\frac{#1}{#2})}
+\newcommand{\cof}[2]{\cos\qty(\frac{#1}{#2})}
+
+% spin
+\newcommand{\up}{\uparrow} %spin up
+\newcommand{\down}{\downarrow} %spin down
+\newcommand{\szero}{\mqty[1 \\ 0]} %spin zero
+\newcommand{\sone}{\mqty[0 \\ 1]} %spin one
+% ---------------------------------------------------------------------------- %

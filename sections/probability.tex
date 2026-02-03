@@ -1,0 +1,41 @@
+\section{Probability}
+
+
+\begin{lemma}[Union bound]\label{lem:UnionBound}
+    Let $A_1,\ldots,A_N$ be events in a probability space. Then,
+    \begin{align}
+        \bbP\left[\bigcup_{i=1}^N A_i\right]
+        \leq \sum_{i=1}^N \bbP[A_i].
+    \end{align}
+\end{lemma}
+
+
+
+\begin{comment}
+
+\begin{lemma}[Hoeffding's Concentration Inequality]\label{lem:Hoeffding}
+    Let $X_1,\ldots,X_N$ be independent $\bbR$-valued random variables and $S_N = \frac1N \sum_{i=1}^N X_i$. Assume that, for every $1\leq i\leq N$, $X_i\in[a_i,b_i]$ almost surely, where $a_i,b_i\in\bbR$, $a_i\leq b_i$. Then, for every $\vep>0$, 
+    \begin{align}
+        \bbP\left[S_N - \bbE[S_N]\geq\vep\right]
+        &\leq \exp\left( -\nicefrac{2N^2\vep^2}{\sum\limits_{i=1}^N (b_i-a_i)^2}\right),\\
+        \bbP\left[\left\lvert S_N - \bbE[S_N]\right\rvert\geq\vep\right]
+        &\leq 2\exp\left( -\nicefrac{2N^2\vep^2}{\sum\limits_{i=1}^N (b_i-a_i)^2}\right).
+    \end{align}
+\end{lemma}
+
+\end{comment}
+
+
+
+\begin{lemma}[McDiarmid's inequality]\label{lem:McDiarmid}
+    Let $Z = (X_1,\ldots,X_N)$ be a finite set of independent $\bbR$-valued random variables and $\phi:\bbR^N\to\bbR$ be a measurable function such that, for every $1\leq i\leq N$, there exists a constant $c_i>0$ such that $\lvert \phi(z) - \phi(z')\rvert\leq c_i$ for all $z,z'\in\bbR^N$ that differ only in the $i$-th coordinate.
+    Then, for every $\vep>0$,
+    \begin{align}
+        \bbP\left[\phi(Z) - \bbE[\phi(Z)]\geq\vep\right]
+        &\leq \exp\left( -\nicefrac{2\vep^2}{\sum\limits_{i=1}^N c_i^2}\right),\\
+        \bbP\left[\bbE[\phi(Z)] - \phi(Z)\geq\vep\right]
+        &\leq \exp\left( -\nicefrac{2\vep^2}{\sum\limits_{i=1}^N c_i^2}\right),\\
+        \bbP\left[\left\lvert \phi(Z) - \bbE[\phi(Z)]\right\rvert\geq\vep\right]
+        &\leq 2\exp\left( -\nicefrac{2\vep^2}{\sum\limits_{i=1}^N c_i^2}\right).
+    \end{align}
+\end{lemma}

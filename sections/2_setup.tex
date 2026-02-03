@@ -1,0 +1,49 @@
+\section{Notation and Setup}
+This section is maily based on the Ref.~\cite{wang2023enhanced}.
+
+\subsection{Supervised Learning Framework}
+We consider a standard supervised learning setting defined by an input space $\calX$ and an output space $\calY$. A learning algorithm is provided with a training set $\calS = \{(x_i, y_i)\}_{i=1}^N$, where samples are drawn i.i.d. from an unknown distribution $\calD$. The objective is to learn a hypothesis function $f_{\bth}: \calX \to \calY$, parameterized by $\bth$, that minimizes the discrepancy between predictions and true labels.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10cm]{circuit_structure.jpg}
+    \caption{Setup of PQC. It consists of $L$ blocks, each of which begins with a fixed unitary operator followed by Pauli rotations applied to each qubit. There are $n L$ trainable gates in total. \cite{wang2023enhanced}}
+    \label{fig:circuit_structure}
+\end{figure}
+
+\subsection{Quantum Circuit Ansatz}
+Our hypothesis class consists of variational quantum machine learning (VQML) models. We specifically adopt a hardware-efficient ansatz for an $N_q$-qubit system composed of $L$ layers (blocks). As shown in the circuit diagram (Fig.~\ref{fig:circuit_structure}), the total unitary operation $U(\bth)$ is a product of layer-wise operations:
+\begin{equation}
+    U(\bth)=\prod_{l=L}^{1} R_{l}\left(\bth_{l}\right) V_l,
+\end{equation}
+where $V_l$ represents a fixed unitary and $R_l(\bth_l)$ represents a trainable rotation layer. The parameters are organized as $\bth = (\bth_1, \dots, \bth_L)$, where each layer's parameters $\bth_l$ contain $N_q$ rotation angles. The rotation operator for the $l$-th layer is defined as a tensor product of single-qubit rotations:
+\begin{equation}
+    R_{l}\left(\bth_{l}\right) = \bigotimes_{m=1}^{N_q} e^{-\frac{i}{2} \th_{l, m} P_{l, m}}.
+\end{equation}
+Here, $P_{l,m} \in \{\bbid, X, Y, Z\}$ represents a standard Pauli operator chosen for the $m$-th qubit in layer $l$.
+
+\subsection{Quantum Embedding and Measurement}
+The interaction between the classical data and the quantum model proceeds as follows:
+1.  Encoding: An input $x$ is mapped to a quantum state $\rho(x)$.
+2.  Evolution: The parameterized channel $\calE_{\bth}$ acts on the state via $\calE_{\bth}(x) = U(\bth) \rho(x) U^\dagger(\bth)$.
+3.  Measurement: An observable $O$ is measured to produce the scalar output:
+    \begin{equation}
+        f_{\bth}(x) \defeq \Tr[O\,\calE_{\bth}(x)].
+    \end{equation}
+
+Note: While the standard setup assumes fixed $V_l$, this formalism accommodates "data re-uploading" schemes where $V_l$ depends on input $x$, as well as noisy channels.
+
+
+\subsection{Risk and Generalization}
+We evaluate performance using a loss function $\calL(y, \hat{y})$. We adopt two standard assumptions for the theoretical analysis:
+1.  Boundedness: The model output is bounded, $|f_{\bth}(x)| \leq C$.
+2.  Lipschitz Continuity: The loss is $L$-Lipschitz with respect to the prediction: $|\calL(y, z) - \calL(y, z')| \leq L |z - z'|$.
+For example, $\calL$ can be the square loss, the cross-entropy loss, or the hinge loss.
+
+We define the Empirical Risk (training error) and Expected Risk (test error) respectively as:
+\begin{align}
+    \hat{R}_N(f_{\bth}) &= \frac1N \sum_{i=1}^{N} \calL(y_i, f_{\bth}(x_i)), \\
+    R(f_{\bth}) &= \bbE_{(x, y) \sim \calD} [\calL(y, f_{\bth}(x))].
+\end{align}
+The central quantity of interest in these notes is the **generalization error**, defined as $\mathrm{gen}(f_{\bth}) \defeq R(f_{\bth}) - \hat{R}_N(f_{\bth})$. Subsequent sections will bound this quantity using covering numbers and Rademacher complexity. Finally, we apply the generalization error bound to the VQML model.
+
