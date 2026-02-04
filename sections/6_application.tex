@@ -12,11 +12,11 @@ In this section, we derive the upper bound of the generalization error depending
     \item $\rho(\bs{x})$: quantum input state
     \item $\calF \defeq \set{f_{\bth}: (\bs{x}_i, y_i) \mapsto \Tr[O \calE_{\bs{\th}}(\rho(\bs{x}_i))]}[\bs{\th} \in \Theta] \subset [0, C]^{\calZ}$: hypothesis class of VQML
     \item $\calL(y_i,f_{\bth}(\bs{x}_i))$: loss function evaluated on a sample $(\bs{x}_i, y_i)$ which is $L$-Lipschitz continuous in the second argument.
-    \item $\hat{R}_N(f_{\bth}) \defeq \frac1N \sum_{i=1}^{N} \calL(y_i, f_{\bth}(\bs{x}_i))$: empirical risk of a hypothesis $f_{\bth}\in\calF$ over a sample $\calS$
+    \item $\hat{R}_N(f_{\bth}) \defeq \frac1N \sum_{i=1}^{N} \calL(y_i, f_{\bth}(\bs{x}_i))$: empirical risk of a hypothesis $f_{\bth}\in\calF$ over the training set $\calS$
     \item $R(f_{\bth}) \defeq \bbE_{(x, y) \sim P} [\calL(y, f_{\bth}(x))]$: expected risk of a hypothesis $f_{\bth}\in\calF$
     \item $\calG \defeq \{(x, y) \mapsto \calL(y, f_{\bth}(x)) \mid f_{\bth} \in \calF\} \subseteq [0, LC]^{\calZ}$: loss function class
-    \item $\calF\bullet\calS \defeq \set{(f_{\bth}(\bs{x}_1),\ldots,f_{\bth}(\bs{x}_N))}[f_{\bth}\in\calF, (\bs{x}_i,y_i)\in\calS] \subset [0, C]^N$: prediction evaluated on a sample $\calS$
-    \item $\calG\bullet\calS \defeq \set{(\calL(y_1,f_{\bth}(\bs{x}_1)), \ldots, \calL(y_N,f_{\bth}(\bs{x}_N)))}[f_{\bth} \in \calF, (\bs{x}_i,y_i)\in\calS] \subset [0, LC]^N$: loss function evaluated on a sample $\calS$
+    \item $\calF\bullet\calS \defeq \set{(f_{\bth}(\bs{x}_1),\ldots,f_{\bth}(\bs{x}_N))}[f_{\bth}\in\calF, (\bs{x}_i,y_i)\in\calS] \subset [0, C]^N$: prediction evaluated over the training set $\calS$
+    \item $\calG\bullet\calS \defeq \set{(\calL(y_1,f_{\bth}(\bs{x}_1)), \ldots, \calL(y_N,f_{\bth}(\bs{x}_N)))}[f_{\bth} \in \calF, (\bs{x}_i,y_i)\in\calS] \subset [0, LC]^N$: loss function evaluated over the training set $\calS$
 \end{itemize}
 
 Remember that from Lemma \ref{lem:rademacher-complexity-bound-2} and \ref{lem:talagrand} the generalization error for any hypothesis $f_{\bth} \in \calF$ is bounded by the Rademacher complexity with probability at least $1-\delta$ as

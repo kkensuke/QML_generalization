@@ -6,11 +6,11 @@
     \item $\calS \defeq \{(\bs{x}_1, y_1), (\bs{x}_2, y_2), \ldots, (\bs{x}_N, y_N)\} \subset \calZ$: : a set of $N$ training samples
     \item $\calF = \set{f: \calX \to [0, C]} \subset \calY^{\calX}$: hypotheses class. $\calY^{\calX}$ denotes the set of all functions from $\calX$ to $\calY$
     \item $\calL(y, f(\bs{x})): \calY \times \calY \to [0, LC]$: loss function. $L$ is the Lipschitz constant of the loss function
-    \item $\hat{R}_N(f) \defeq \frac1N \sum_{i=1}^{N} \calL(y_i, f(\bs{x}_i))$: empirical risk of a hypothesis $f\in\calF$ over a sample $\calS$
+    \item $\hat{R}_N(f) \defeq \frac1N \sum_{i=1}^{N} \calL(y_i, f(\bs{x}_i))$: empirical risk of a hypothesis $f\in\calF$ over the training set $\calS$
     \item $R(f) \defeq \bbE_{(\bs{x}, y) \sim P} [\calL(y, f(\bs{x}))]$: expected risk of a hypothesis $f\in\calF$
     \item $\calG \defeq \{(\bs{x}, y) \mapsto \calL(y, f(\bs{x})) \mid f \in \calF\} \subseteq [0, LC]^{\calZ}$: loss function class
-    \item $\calF\bullet\calS \defeq \set{(f(\bs{x}_1),\ldots,f(\bs{x}_N))}[f \in \calF, (\bs{x}_i,y_i)\in\calS] \subset [0, C]^N$: prediction evaluated on a sample $\calS$
-    \item $\calG\bullet\calS \defeq \set{(\calL(y_1,f(\bs{x}_1)), \ldots, \calL(y_N,f(\bs{x}_N)))}[f \in \calF, (\bs{x}_i,y_i)\in\calS] \subset [0, LC]^N$: loss function evaluated on a sample $\calS$
+    \item $\calF\bullet\calS \defeq \set{(f(\bs{x}_1),\ldots,f(\bs{x}_N))}[f \in \calF, (\bs{x}_i,y_i)\in\calS] \subset [0, C]^N$: prediction evaluated over the training set $\calS$
+    \item $\calG\bullet\calS \defeq \set{(\calL(y_1,f(\bs{x}_1)), \ldots, \calL(y_N,f(\bs{x}_N)))}[f \in \calF, (\bs{x}_i,y_i)\in\calS] \subset [0, LC]^N$: loss function evaluated over the training set $\calS$
 \end{itemize}
 
 
